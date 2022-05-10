@@ -72,12 +72,12 @@ td {
 }
 /* remember to define focus styles! */
 :focus {
-  outline: 0;
+  outline: rgb(255, 157, 0) solid 2px;
 }
 body {
   line-height: 1;
-  color: black;
-  background: white;
+  color: var(--clr-text);
+  background: var(--clr-bg1);
 }
 ol,
 ul {
@@ -108,8 +108,13 @@ q {
 /* Custom Styles */
 
 :root {
-  --l-clr-primary: rgb(255, 157, 183);
-  --d-clr-primary: rgb(149, 18, 53);
+  --clr-primary: rgb(18, 145, 149);
+  --clr-bg1: rgb(20, 19, 38);
+  --clr-bg2: rgb(57, 52, 72);
+  --clr-text: rgb(255, 255, 255);
+  --clr-subtext: rgb(209, 206, 218);
+  --container-width: 90%;
+  --heading-font-size: 1.4rem;
 }
 
 html,
@@ -126,4 +131,33 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar {
+  width: 1rem;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--clr-bg1);
+  border-radius: 1rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--clr-primary);
+  /* border: 0.15rem solid var(--clr-bg1); */
+  border-radius: 1rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: white;
+}
+
+/* Media Queries */
+
+@media (min-width: 500px) {
+  :root {
+    --container-width: 450px;
+  }
 }

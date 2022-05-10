@@ -1,40 +1,11 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: rgb(238, 238, 238);
-  margin: 1rem auto;
-  border-radius: 0.5rem;
-  width: 300px;
-}
-
 .title {
   font-size: 2rem;
   text-align: center;
   margin: 1rem auto;
   padding: 0.5rem 2rem;
-  background-color: var(--d-clr-primary);
+  background-color: var(--clr-primary);
   color: white;
   font-weight: 700;
   border-radius: 3rem;
   width: max-content;
-}
-
-.listHeading {
-  font-size: 1.3rem;
-  padding: 0.4rem 0;
-  border-bottom: 0.15rem black solid;
-  width: 100%;
-  text-align: center;
-  font-weight: 700;
-}
-
-.listItem {
-  padding: 0.3rem;
-}
-
-.searchResultsList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
 }
