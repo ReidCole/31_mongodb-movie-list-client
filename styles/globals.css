@@ -72,7 +72,7 @@ td {
 }
 /* remember to define focus styles! */
 :focus {
-  outline: rgb(255, 157, 0) solid 2px;
+  outline: 0.15rem solid var(--clr-primary);
 }
 body {
   line-height: 1;
@@ -109,6 +109,7 @@ q {
 
 :root {
   --clr-primary: rgb(18, 145, 149);
+  --clr-primary-h: rgb(50, 203, 209);
   --clr-bg1: rgb(20, 19, 38);
   --clr-bg2: rgb(57, 52, 72);
   --clr-text: rgb(255, 255, 255);
@@ -151,7 +152,7 @@ a {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: white;
+  background: var(--clr-primary-h);
 }
 
 /* Media Queries */

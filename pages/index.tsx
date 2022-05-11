@@ -6,19 +6,18 @@ import styles from "../styles/Home.module.css";
 import useSWR, { Fetcher } from "swr";
 import SearchResult from "../components/SearchResult/SearchResult";
 import List from "../components/List/List";
-import SearchResults from "../components/SearchResults/SearchResults";
 import SearchSection from "../components/SearchSection/SearchSection";
 
 // todo: use swr for initial load of list, not for search results
 
-export type Listing = {
+export type ListingType = {
   title: string;
   imgUrl: string | null;
   id: number | null;
   mediaType: "movie" | "tv";
 };
 
-const testList: Listing[] = [
+const testList: ListingType[] = [
   {
     title: "Liz and the Blue Bird",
     id: 482150,
@@ -45,7 +44,7 @@ const Home: NextPage = () => {
 
         <SearchSection />
 
-        <List list={testList} />
+        <List list={testList} title="Test List" />
       </main>
     </>
   );

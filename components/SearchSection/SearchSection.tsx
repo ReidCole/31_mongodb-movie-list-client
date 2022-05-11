@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { Listing } from "../../pages";
-import SearchResult from "../SearchResult/SearchResult";
+import { ListingType } from "../../pages";
 import styles from "./SearchSection.module.css";
-import { SearchOutlined, Loading3QuartersOutlined } from "@ant-design/icons";
+import { SearchOutlined, Loading3QuartersOutlined, PlusCircleFilled } from "@ant-design/icons";
+import Listing from "../Listing/Listing";
+import ListingButton from "../ListingButton/ListingButton";
 
 const SearchSection: React.FC = () => {
   const [query, setQuery] = useState<string>("");
-  const [searchResults, setSearchResults] = useState<Listing[]>([]);
+  const [searchResults, setSearchResults] = useState<ListingType[]>([]);
   const [includeAdult, setIncludeAdult] = useState<boolean>(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   function fetchSearchResults() {
     if (query.length === 0) {
@@ -24,7 +25,7 @@ const SearchSection: React.FC = () => {
       .then((res) => res.json())
       .then((json) => {
         console.log(json.results);
-        let listings: Listing[] = [];
+        let listings: ListingType[] = [];
         json.results.map(
           (result: {
             id: number;
@@ -36,7 +37,7 @@ const SearchSection: React.FC = () => {
             if (result.media_type === "person") {
               return;
             }
-            const listing: Listing = {
+            const listing: ListingType = {
               id: result.id,
               title: result.media_type === "movie" ? result.title : result.name,
               imgUrl: result.poster_path
@@ -75,13 +76,13 @@ const SearchSection: React.FC = () => {
             <SearchOutlined />
           </button>
         </form>
-        <label>
+        <label className={styles.adultContentLabel}>
           <input
             type="checkbox"
             checked={includeAdult}
             onChange={(e) => setIncludeAdult(e.target.checked)}
           />{" "}
-          Include Adult Content
+          <p>Include Adult Content</p>
         </label>
       </div>
 
@@ -89,12 +90,25 @@ const SearchSection: React.FC = () => {
         <div className={styles.loadingDiv}>
           <Loading3QuartersOutlined className={styles.loadingIcon} />
         </div>
-      ) : (
+      ) : searchResults.length > 0 ? (
         <div className={styles.list}>
           {searchResults.map((result) => (
-            <SearchResult key={result.id} result={result} />
+            <Listing
+              key={result.id}
+              listing={result}
+              buttons={[
+                <ListingButton
+                  key={0}
+                  Icon={PlusCircleFilled}
+                  mouseOverText="Add To List"
+                  onClick={() => console.log("add to list")}
+                />,
+              ]}
+            />
           ))}
         </div>
+      ) : (
+        <div className={styles.noSearchText}>Search Results will appear here</div>
       )}
     </div>
   );
