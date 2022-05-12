@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--clr-bg2);
+  margin: 1rem auto;
+  border-radius: 0.5rem;
+  width: var(--container-width);
+}
+
+.header {
+  border-bottom: 0.15rem solid white;
+  width: 100%;
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}

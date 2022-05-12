@@ -4,8 +4,13 @@ import styles from "./SearchSection.module.css";
 import { SearchOutlined, Loading3QuartersOutlined, PlusCircleFilled } from "@ant-design/icons";
 import Listing from "../Listing/Listing";
 import ListingButton from "../ListingButton/ListingButton";
+import Container from "../Container/Container";
 
-const SearchSection: React.FC = () => {
+type Props = {
+  onAddToList(listing: ListingType): void;
+};
+
+const SearchSection: React.FC<Props> = ({ onAddToList: addToList }) => {
   const [query, setQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<ListingType[]>([]);
   const [includeAdult, setIncludeAdult] = useState<boolean>(false);
@@ -38,12 +43,13 @@ const SearchSection: React.FC = () => {
               return;
             }
             const listing: ListingType = {
-              id: result.id,
+              movieDbId: result.id,
               title: result.media_type === "movie" ? result.title : result.name,
               imgUrl: result.poster_path
                 ? `https://image.tmdb.org/t/p/w500/${result.poster_path}`
                 : null,
               mediaType: result.media_type === "movie" ? "movie" : "tv",
+              listId: null,
             };
             listings.push(listing);
           }
@@ -55,62 +61,65 @@ const SearchSection: React.FC = () => {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.heading}>Search for Movies and TV Shows</h2>
+    <Container
+      header={
+        <>
+          <h2 className={styles.heading}>Search for Movies and TV Shows</h2>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            fetchSearchResults();
-          }}
-          className={styles.searchForm}
-        >
-          <input
-            className={styles.searchInput}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <button type="submit" className={styles.searchButton}>
-            <SearchOutlined />
-          </button>
-        </form>
-        <label className={styles.adultContentLabel}>
-          <input
-            type="checkbox"
-            checked={includeAdult}
-            onChange={(e) => setIncludeAdult(e.target.checked)}
-          />{" "}
-          <p>Include Adult Content</p>
-        </label>
-      </div>
-
-      {loading ? (
-        <div className={styles.loadingDiv}>
-          <Loading3QuartersOutlined className={styles.loadingIcon} />
-        </div>
-      ) : searchResults.length > 0 ? (
-        <div className={styles.list}>
-          {searchResults.map((result) => (
-            <Listing
-              key={result.id}
-              listing={result}
-              buttons={[
-                <ListingButton
-                  key={0}
-                  Icon={PlusCircleFilled}
-                  mouseOverText="Add To List"
-                  onClick={() => console.log("add to list")}
-                />,
-              ]}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              fetchSearchResults();
+            }}
+            className={styles.searchForm}
+          >
+            <input
+              className={styles.searchInput}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
             />
-          ))}
-        </div>
-      ) : (
-        <div className={styles.noSearchText}>Search Results will appear here</div>
-      )}
-    </div>
+            <button type="submit" className={styles.searchButton}>
+              <SearchOutlined />
+            </button>
+          </form>
+          <label className={styles.adultContentLabel}>
+            <input
+              type="checkbox"
+              checked={includeAdult}
+              onChange={(e) => setIncludeAdult(e.target.checked)}
+            />{" "}
+            <p>Include Adult Content</p>
+          </label>
+        </>
+      }
+      body={
+        loading ? (
+          <div className={styles.loadingDiv}>
+            <Loading3QuartersOutlined className={styles.loadingIcon} />
+          </div>
+        ) : searchResults.length > 0 ? (
+          <div className={styles.list}>
+            {searchResults.map((result) => (
+              <Listing
+                key={result.movieDbId}
+                listing={result}
+                buttons={[
+                  <ListingButton
+                    key={0}
+                    Icon={PlusCircleFilled}
+                    mouseOverText="Add To List"
+                    onClick={() => addToList(result)}
+                  />,
+                ]}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className={styles.noSearchText}>Search results will appear here</div>
+        )
+      }
+    />
   );
 };
 

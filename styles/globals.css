@@ -137,7 +137,7 @@ a {
 /* Scrollbar */
 
 ::-webkit-scrollbar {
-  width: 1rem;
+  width: 0.8rem;
 }
 
 ::-webkit-scrollbar-track {
