@@ -14,7 +14,7 @@ type Props = {
   listDescription: string;
   setListDescription(val: string): void;
   listings: ListingType[];
-  setListings(val: ListingType[]): void;
+  setListings(listings: ListingType[]): void;
   onRemoveFromList(listing: ListingType): void;
 };
 

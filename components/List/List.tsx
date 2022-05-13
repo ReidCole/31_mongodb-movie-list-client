@@ -9,28 +9,43 @@ import {
   SaveOutlined,
   ShareAltOutlined,
   EditOutlined,
+  UndoOutlined,
 } from "@ant-design/icons";
 import Listing from "../Listing/Listing";
 import { ListingType, ListType } from "../../pages/list/[id]";
 import Container from "../Container/Container";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/router";
 
 type Props = {
-  listObjectId: string | null;
+  listName: string;
+  setListName(val: string): void;
+  listDescription: string;
+  setListDescription(val: string): void;
+  listings: ListingType[];
+  setListings(listings: ListingType[]): void;
+  onRemoveFromList(listing: ListingType): void;
+  objectId: string;
+  ownerUsername: string;
+  listEdited: boolean;
+  onRevertChanges(): void;
 };
 
-const List: React.FC<Props> = ({ listObjectId }) => {
-  const [listName, setListName] = useState("");
-  const [listDescription, setListDescription] = useState("");
-  const [listings, setListings] = useState<ListingType[]>([]);
-  const [ownerUserId, setOwnerUserId] = useState("");
-  const [ownerUsername, setOwnerUsername] = useState("");
-  const [objectId, setObjectId] = useState("");
-
-  function removeFromList(listing: ListingType) {
-    setListings((prev) => prev.filter((l) => l.idWithinList !== listing.idWithinList));
-  }
+const List: React.FC<Props> = ({
+  listName,
+  setListName,
+  listDescription,
+  setListDescription,
+  listings,
+  setListings,
+  objectId,
+  ownerUsername,
+  onRemoveFromList,
+  listEdited,
+  onRevertChanges,
+}) => {
+  const router = useRouter();
 
   function saveList() {
     console.log("save list", objectId);
@@ -48,23 +63,10 @@ const List: React.FC<Props> = ({ listObjectId }) => {
         console.error("error saving list", e);
       });
   }
-
-  useEffect(() => {
-    if (listObjectId === null) return;
-
-    axios.get(`http://localhost:4000/getlist/${listObjectId}`).then((res) => {
-      const data = res.data;
-
-      setListName(data.listName);
-      setListDescription(data.listDescription);
-      setListings(data.listings);
-      setOwnerUserId(data.ownerUserId ? data.ownerUserId : "fix later");
-
-      setObjectId(data._id);
-    });
-  }, [listObjectId]);
-
-  if (listings.length === 0) return <div>Loading...</div>;
+  function deleteList() {
+    console.log("delete list");
+    axios.delete(`http://localhost:4000/deletelist/${objectId}`);
+  }
 
   return (
     <Container
@@ -75,11 +77,11 @@ const List: React.FC<Props> = ({ listObjectId }) => {
             <p>{listDescription}</p>
           </div>
           <div>
-            <button>
+            <button onClick={deleteList}>
               <DeleteOutlined />
               delete
             </button>
-            <button onClick={saveList}>
+            <button onClick={saveList} disabled={!listEdited}>
               <SaveOutlined />
               save
             </button>
@@ -90,6 +92,10 @@ const List: React.FC<Props> = ({ listObjectId }) => {
             <button>
               <EditOutlined />
               edit name or desc
+            </button>
+            <button onClick={onRevertChanges} disabled={!listEdited}>
+              <UndoOutlined />
+              revert changes
             </button>
           </div>
           <p>Created by user {ownerUsername} (send username in server response from /getlist)</p>
@@ -103,14 +109,14 @@ const List: React.FC<Props> = ({ listObjectId }) => {
         <div className={styles.list}>
           {listings.map((listing) => (
             <Listing
-              key={listing.movieDbId}
+              key={listing.idWithinList}
               listing={listing}
               buttons={[
                 <ListingButton
                   key={0}
                   Icon={MinusCircleFilled}
                   mouseOverText="Remove From List"
-                  onClick={() => removeFromList(listing)}
+                  onClick={() => onRemoveFromList(listing)}
                 />,
               ]}
             />
