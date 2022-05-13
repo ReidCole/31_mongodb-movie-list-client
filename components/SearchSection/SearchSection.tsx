@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { ListingType } from "../../pages";
 import styles from "./SearchSection.module.css";
 import { SearchOutlined, Loading3QuartersOutlined, PlusCircleFilled } from "@ant-design/icons";
 import Listing from "../Listing/Listing";
 import ListingButton from "../ListingButton/ListingButton";
 import Container from "../Container/Container";
+import { ListingType } from "../../pages/list/[id]";
 
 type Props = {
   onAddToList(listing: ListingType): void;
@@ -49,7 +49,7 @@ const SearchSection: React.FC<Props> = ({ onAddToList: addToList }) => {
                 ? `https://image.tmdb.org/t/p/w500/${result.poster_path}`
                 : null,
               mediaType: result.media_type === "movie" ? "movie" : "tv",
-              listId: null,
+              idWithinList: null,
             };
             listings.push(listing);
           }

@@ -8,6 +8,7 @@ import SearchSection from "../components/SearchSection/SearchSection";
 import { ListType } from "./list/[id]";
 import NewList from "../components/NewList/NewList";
 import TitleBar from "../components/TitleBar/TitleBar";
+import Link from "next/link";
 
 const Home: NextPage = () => {
   return (
@@ -19,11 +20,17 @@ const Home: NextPage = () => {
       <main>
         <TitleBar />
 
-        <p>buttons: create new list | find list by name / id</p>
-        <p>
-          todo: make list/new page where you can make a new list. it should have a section to write
-          the name and other details, the search section, and the list itself
-        </p>
+        <Link href="/newlist">Create New List</Link>
+        <label>
+          <p>Search For List by Name</p>
+          <input type="text" />
+        </label>
+        <label>
+          <p>Search For List by ID</p>
+          <input type="text" />
+        </label>
+
+        <p>Show lists from local storage and account</p>
       </main>
     </>
   );
