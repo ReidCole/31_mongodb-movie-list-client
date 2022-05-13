@@ -1,9 +1,10 @@
-import { MinusCircleFilled } from "@ant-design/icons";
+import { MinusCircleFilled, UserOutlined, DownloadOutlined, UndoOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { ListingType, ListType } from "../../pages/list/[id]";
 import Container from "../Container/Container";
+import ListButton from "../ListButton/ListButton";
 import Listing from "../Listing/Listing";
 import ListingButton from "../ListingButton/ListingButton";
 import styles from "./NewList.module.css";
@@ -45,7 +46,7 @@ const NewList: React.FC<Props> = ({
       listings: listings,
     };
     axios
-      .post("http://localhost:4000/savelist", newList)
+      .post("http://localhost:4000/createlist", newList)
       .then((res) => router.push(`/list/${res.data}`));
   }
 
@@ -54,24 +55,36 @@ const NewList: React.FC<Props> = ({
       header={
         <>
           <h2 className={styles.heading}>New List</h2>
-          <div>
-            <label className={styles.listNameLabel}>
-              <p>List Name</p>
-              <input type="text" value={listName} onChange={(e) => setListName(e.target.value)} />
-            </label>
-            <label className={styles.listNameLabel}>
-              <p>Description</p>
-              <textarea
-                value={listDescription}
-                onChange={(e) => setListDescription(e.target.value)}
-                rows={4}
-              />
-            </label>
+          <div className={styles.detailsSection}>
+            <input
+              className={styles.editTitle}
+              type="text"
+              value={listName}
+              placeholder="Name..."
+              onChange={(e) => setListName(e.target.value)}
+            />
+            <textarea
+              className={styles.editDescription}
+              value={listDescription}
+              onChange={(e) => setListDescription(e.target.value)}
+              rows={4}
+              placeholder="Description..."
+            />
           </div>
-          <button onClick={saveToAccount}>Save to Account (works)</button>
-          <p>(only enable save button if the list has changed)</p>
-          <button>Save to Local Storage (todo)</button>
-          <button onClick={() => setListings([])}>Reset (works)</button>
+          <div className={styles.buttonSection}>
+            <ListButton text="Save to Account" Icon={UserOutlined} onClick={saveToAccount} />
+            <ListButton
+              text="Save to Local Storage (todo)"
+              Icon={DownloadOutlined}
+              onClick={() => {}}
+            />
+            <ListButton
+              text="Reset"
+              Icon={UndoOutlined}
+              onClick={() => setListings([])}
+              disabled={listings.length === 0}
+            />
+          </div>
         </>
       }
       body={

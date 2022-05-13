@@ -1,0 +1,30 @@
+.button {
+  display: flex;
+  flex-direction: row;
+  padding: 0.6rem 0.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background-color: var(--clr-primary);
+  color: var(--clr-text);
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+.button:hover,
+.button:focus {
+  outline: none;
+  background-color: var(--clr-primary-h);
+  color: black;
+}
+.button:disabled {
+  background-color: rgb(112, 110, 118);
+}
+.button:disabled:hover {
+  color: white;
+}
+
+.icon {
+  font-size: 1rem;
+}

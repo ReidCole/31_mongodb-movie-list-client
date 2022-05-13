@@ -68,11 +68,10 @@
   width: 2.5rem;
   font-size: 1.1rem;
 }
-.searchButton:hover {
-  background-color: var(--clr-primary-h);
-}
+.searchButton:hover,
 .searchButton:focus {
   background-color: var(--clr-primary-h);
+  color: black;
   outline: none;
 }
 

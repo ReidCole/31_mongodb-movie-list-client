@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import List from "../../components/List/List";
 import SearchSection from "../../components/SearchSection/SearchSection";
+import TitleBar from "../../components/TitleBar/TitleBar";
 
 export type ListType = {
   listName: string;
@@ -37,6 +38,7 @@ const ListPage: NextPage = () => {
   const [ownerUserId, setOwnerUserId] = useState("");
   const [ownerUsername, setOwnerUsername] = useState("");
   const [objectId, setObjectId] = useState("");
+  const [listExists, setListExists] = useState<boolean>(true);
   const router = useRouter();
 
   function addToList(listing: ListingType) {
@@ -59,24 +61,42 @@ const ListPage: NextPage = () => {
     setListings(unchangedValues.listings);
   }
 
+  function onSaved() {
+    setUnchangedValues({
+      listName: listName,
+      listDescription: listDescription,
+      listings: listings,
+    });
+  }
+
   useEffect(() => {
     if (typeof router.query.id === "undefined") return;
 
-    axios.get(`http://localhost:4000/getlist/${router.query.id}`).then((res) => {
-      const data = res.data;
+    axios
+      .get(`http://localhost:4000/getlist/${router.query.id}`)
+      .then((res) => {
+        const data = res.data;
 
-      setListName(data.listName);
-      setListDescription(data.listDescription);
-      setListings(data.listings);
-      setOwnerUserId(data.ownerUserId ? data.ownerUserId : "fix later");
-      setObjectId(data._id);
+        setListName(data.listName);
+        setListDescription(data.listDescription);
+        setListings(data.listings);
+        setOwnerUserId(data.ownerUserId ? data.ownerUserId : "fix later");
+        setObjectId(data._id);
 
-      setUnchangedValues({
-        listName: data.listName,
-        listDescription: data.listDescription,
-        listings: data.listings,
+        setUnchangedValues({
+          listName: data.listName,
+          listDescription: data.listDescription,
+          listings: data.listings,
+        });
+      })
+      .catch((e) => {
+        if (e.response.status == 404) {
+          console.error("No list with this id could be found in the database");
+          setListExists(false);
+        } else {
+          console.error(e.message);
+        }
       });
-    });
   }, [router.query.id]);
 
   useEffect(() => {
@@ -90,6 +110,14 @@ const ListPage: NextPage = () => {
     setListEdited(!isSame);
   }, [listName, listDescription, listings, unchangedValues]);
 
+  if (!listExists)
+    return (
+      <div>
+        Error: There is no list with the given id in the database. This list may have been deleted
+        or there was a typo.
+      </div>
+    );
+
   if (listings.length === 0) return <div>Loading...</div>;
 
   return (
@@ -98,6 +126,8 @@ const ListPage: NextPage = () => {
         <title>List - Movie List Maker</title>
       </Head>
       <main>
+        <TitleBar />
+
         <SearchSection onAddToList={addToList} />
 
         <List
@@ -112,6 +142,7 @@ const ListPage: NextPage = () => {
           onRemoveFromList={removeFromList}
           listEdited={listEdited}
           onRevertChanges={revertChanges}
+          onSaved={onSaved}
         />
       </main>
     </>

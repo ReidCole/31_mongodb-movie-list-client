@@ -25,3 +25,40 @@
   color: var(--clr-subtext);
   font-weight: bold;
 }
+
+.detailsSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.editTitle,
+.editDescription {
+  width: 100%;
+  border: none;
+  background-color: var(--clr-bg1);
+  color: white;
+  border-radius: 0.4rem;
+}
+.editTitle:focus,
+.editDescription:focus {
+  background-color: white;
+  color: black;
+  outline: none;
+}
+.editTitle {
+  padding: 0.5rem 0.6rem;
+  font-size: var(--heading-font-size);
+}
+.editDescription {
+  font: inherit;
+  padding: 0.6rem;
+  font-size: 1rem;
+}
+
+.buttonSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
