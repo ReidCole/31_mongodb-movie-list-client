@@ -3,9 +3,9 @@ import Head from "next/head";
 import { useState } from "react";
 import NewList from "../components/NewList/NewList";
 import SearchSection from "../components/SearchSection/SearchSection";
-import TitleBar from "../components/TitleBar/TitleBar";
 import { nanoid } from "nanoid";
-import { ListingType } from "./list/[id]";
+import { ListingType } from "../components/ListPage/ListPage";
+import Header from "../components/Header/Header";
 
 const NewListPage: NextPage = () => {
   const [listName, setListName] = useState("");
@@ -30,7 +30,8 @@ const NewListPage: NextPage = () => {
         <title>New List - Movie List Maker</title>
       </Head>
       <main>
-        <TitleBar />
+        <Header />
+
         <SearchSection onAddToList={addToList} />
         <NewList
           listName={listName}

@@ -10,7 +10,6 @@
   border: none;
   border-radius: 0.4rem;
   cursor: pointer;
-  font-weight: bold;
 }
 .button:hover,
 .button:focus {

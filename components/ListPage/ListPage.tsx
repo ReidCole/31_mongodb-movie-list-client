@@ -3,9 +3,9 @@ import { nanoid } from "nanoid";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Header from "../Header/Header";
 import List from "../List/List";
 import SearchSection from "../SearchSection/SearchSection";
-import TitleBar from "../TitleBar/TitleBar";
 
 type Props = {
   listLocation: "localStorage" | "server";
@@ -16,7 +16,7 @@ export type ListType = {
   listDescription: string;
   listings: ListingType[];
   ownerUserId: string;
-  localStorageId?: string;
+  listId: string;
 };
 
 export type ListingType = {
@@ -116,33 +116,33 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
           listName: string;
           listDescription: string;
           listings: ListingType[];
-          localStorageId: string;
+          listId: string;
         }) => {
           const l: ListType = {
             listName: list.listName,
             listDescription: list.listDescription,
             listings: list.listings,
-            localStorageId: list.localStorageId,
+            listId: list.listId,
             ownerUserId: "localstorage",
           };
           return l;
         }
       );
 
-      const thisList = typedLists.find((l) => l.localStorageId === router.query.id);
+      const thisList = typedLists.find((l) => l.listId === router.query.id);
       if (typeof thisList === "undefined") {
         setErrorGettingList("No list with the given id exists in local storage.");
         return;
       }
-      if (typeof thisList.localStorageId === "undefined") {
-        console.error("list localStorageId is undefined");
+      if (typeof thisList.listId === "undefined") {
+        console.error("listId is undefined");
         return;
       }
       setListName(thisList.listName);
       setListDescription(thisList.listDescription);
       setListings(thisList.listings);
       setOwnerUserId("You (local storage)");
-      setListId(thisList.localStorageId);
+      setListId(thisList.listId);
       setUnchangedValues({
         listName: thisList.listName,
         listDescription: thisList.listDescription,
@@ -172,7 +172,7 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
         <title>List - Movie List Maker</title>
       </Head>
       <main>
-        <TitleBar />
+        <Header />
 
         <SearchSection onAddToList={addToList} />
 
