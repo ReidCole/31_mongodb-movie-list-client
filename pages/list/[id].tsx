@@ -13,6 +13,7 @@ export type ListType = {
   listDescription: string;
   listings: ListingType[];
   ownerUserId: string;
+  localStorageId?: string;
 };
 
 export type ListingType = {

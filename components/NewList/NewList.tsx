@@ -1,7 +1,8 @@
 import { MinusCircleFilled, UserOutlined, DownloadOutlined, UndoOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { nanoid } from "nanoid";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ListingType, ListType } from "../../pages/list/[id]";
 import Container from "../Container/Container";
 import ListButton from "../ListButton/ListButton";
@@ -29,14 +30,12 @@ const NewList: React.FC<Props> = ({
   onRemoveFromList,
 }) => {
   const router = useRouter();
+  const [canSave, setCanSave] = useState<boolean>(false);
 
   function saveToAccount() {
-    if (listings.length === 0) {
-      console.error("list must have at least one movie or tv show");
+    if (!canSave) {
+      console.error("error validating list. make sure all required fields are filled in");
       return;
-    }
-    if (listName.length === 0) {
-      console.error("list name must not be blank");
     }
 
     const newList: ListType = {
@@ -49,6 +48,39 @@ const NewList: React.FC<Props> = ({
       .post("http://localhost:4000/createlist", newList)
       .then((res) => router.push(`/list/${res.data}`));
   }
+
+  function saveToLocalStorage() {
+    if (!canSave) {
+      console.error("error validating list. make sure all required fields are filled in");
+      return;
+    }
+
+    const newList: ListType = {
+      listName: listName,
+      listDescription: listDescription,
+      ownerUserId: "localstorage",
+      listings: listings,
+      localStorageId: nanoid(),
+    };
+    const currentListsString = localStorage.getItem("lists");
+    if (currentListsString === null) {
+      const lists: ListType[] = [newList];
+      const listsString = JSON.stringify(lists);
+      localStorage.setItem("lists", listsString);
+    } else {
+      let currentLists = JSON.parse(currentListsString);
+      currentLists.push(newList);
+      localStorage.setItem("lists", currentLists);
+    }
+  }
+
+  useEffect(() => {
+    if (listName.length > 0 && listings.length > 0) {
+      setCanSave(true);
+    } else {
+      setCanSave(false);
+    }
+  }, [listName, listings]);
 
   return (
     <Container
@@ -72,17 +104,23 @@ const NewList: React.FC<Props> = ({
             />
           </div>
           <div className={styles.buttonSection}>
-            <ListButton text="Save to Account" Icon={UserOutlined} onClick={saveToAccount} />
             <ListButton
-              text="Save to Local Storage (todo)"
+              text="Save to Account"
+              Icon={UserOutlined}
+              onClick={saveToAccount}
+              disabled={!canSave}
+            />
+            <ListButton
+              text="Save to Local Storage"
               Icon={DownloadOutlined}
-              onClick={() => {}}
+              onClick={saveToLocalStorage}
+              disabled={!canSave}
             />
             <ListButton
               text="Reset"
               Icon={UndoOutlined}
               onClick={() => setListings([])}
-              disabled={listings.length === 0}
+              disabled={!canSave}
             />
           </div>
         </>

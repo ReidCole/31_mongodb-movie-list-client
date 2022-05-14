@@ -1,16 +1,22 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
-import { useState } from "react";
-import useSWR, { Fetcher } from "swr";
-import List from "../components/List/List";
-import SearchSection from "../components/SearchSection/SearchSection";
+import { useEffect, useState } from "react";
 import { ListType } from "./list/[id]";
-import NewList from "../components/NewList/NewList";
 import TitleBar from "../components/TitleBar/TitleBar";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
+  const [localStorageLists, setLocalStorageLists] = useState<ListType[]>([]);
+
+  useEffect(() => {
+    const lsLists = localStorage.getItem("lists");
+    if (lsLists == null) {
+      return;
+    }
+    setLocalStorageLists(JSON.parse(lsLists));
+  }, []);
+
   return (
     <>
       <Head>
@@ -31,6 +37,15 @@ const Home: NextPage = () => {
         </label>
 
         <p>Show lists from local storage and account</p>
+
+        <div>
+          <h2>Local Storage Lists</h2>
+          {localStorageLists.map((list) => (
+            <div key={list.localStorageId}>
+              <Link href={`/list/${list.localStorageId}/?local=true`}>{list.listName}</Link>
+            </div>
+          ))}
+        </div>
       </main>
     </>
   );
