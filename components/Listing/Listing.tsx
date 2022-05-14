@@ -1,8 +1,8 @@
 import Image from "next/image";
-import { ListingType } from "../../pages";
 import styles from "./Listing.module.css";
 import unloadedImg from "../../public/img/unloaded-img.png";
 import noImg from "../../public/img/no-img.png";
+import { ListingType } from "../ListPage/ListPage";
 
 type Props = {
   listing: ListingType;

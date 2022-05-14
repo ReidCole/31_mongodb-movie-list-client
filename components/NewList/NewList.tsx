@@ -3,7 +3,7 @@ import axios from "axios";
 import { nanoid } from "nanoid";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { ListingType, ListType } from "../../pages/list/[id]";
+import { ListingType, ListType } from "../../components/ListPage/ListPage";
 import Container from "../Container/Container";
 import ListButton from "../ListButton/ListButton";
 import Listing from "../Listing/Listing";
@@ -70,8 +70,10 @@ const NewList: React.FC<Props> = ({
     } else {
       let currentLists = JSON.parse(currentListsString);
       currentLists.push(newList);
-      localStorage.setItem("lists", currentLists);
+      const newListsString = JSON.stringify(currentLists);
+      localStorage.setItem("lists", newListsString);
     }
+    router.push(`/local/${newList.localStorageId}`);
   }
 
   useEffect(() => {

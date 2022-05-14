@@ -4,7 +4,7 @@ import { SearchOutlined, Loading3QuartersOutlined, PlusCircleFilled } from "@ant
 import Listing from "../Listing/Listing";
 import ListingButton from "../ListingButton/ListingButton";
 import Container from "../Container/Container";
-import { ListingType } from "../../pages/list/[id]";
+import { ListingType } from "../ListPage/ListPage";
 
 type Props = {
   onAddToList(listing: ListingType): void;

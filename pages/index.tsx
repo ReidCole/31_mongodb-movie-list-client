@@ -1,10 +1,10 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { ListType } from "./list/[id]";
 import TitleBar from "../components/TitleBar/TitleBar";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { ListType } from "../components/ListPage/ListPage";
 
 const Home: NextPage = () => {
   const [localStorageLists, setLocalStorageLists] = useState<ListType[]>([]);
@@ -42,7 +42,7 @@ const Home: NextPage = () => {
           <h2>Local Storage Lists</h2>
           {localStorageLists.map((list) => (
             <div key={list.localStorageId}>
-              <Link href={`/list/${list.localStorageId}/?local=true`}>{list.listName}</Link>
+              <Link href={`/local/${list.localStorageId}`}>{list.listName}</Link>
             </div>
           ))}
         </div>
