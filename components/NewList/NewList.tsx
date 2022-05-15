@@ -4,8 +4,8 @@ import { nanoid } from "nanoid";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ListingType, ListType } from "../../components/ListPage/ListPage";
+import Button from "../Button/Button";
 import Container from "../Container/Container";
-import ListButton from "../ListButton/ListButton";
 import Listing from "../Listing/Listing";
 import ListingButton from "../ListingButton/ListingButton";
 import styles from "./NewList.module.css";
@@ -107,24 +107,15 @@ const NewList: React.FC<Props> = ({
             />
           </div>
           <div className={styles.buttonSection}>
-            <ListButton
-              text="Save to Account"
-              Icon={UserOutlined}
-              onClick={saveToAccount}
-              disabled={!canSave}
-            />
-            <ListButton
-              text="Save to Local Storage"
-              Icon={DownloadOutlined}
-              onClick={saveToLocalStorage}
-              disabled={!canSave}
-            />
-            <ListButton
-              text="Reset"
-              Icon={UndoOutlined}
-              onClick={() => setListings([])}
-              disabled={!canSave}
-            />
+            <Button onClick={saveToAccount} disabled={!canSave}>
+              <UserOutlined /> Save to Account
+            </Button>
+            <Button onClick={saveToLocalStorage} disabled={!canSave}>
+              <DownloadOutlined /> Save to Local Storage
+            </Button>
+            <Button onClick={() => setListings([])} disabled={!canSave}>
+              <UndoOutlined /> Reset
+            </Button>
           </div>
         </>
       }

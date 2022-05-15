@@ -14,8 +14,8 @@ import Container from "../Container/Container";
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
-import ListButton from "../ListButton/ListButton";
 import { ListingType, ListType } from "../ListPage/ListPage";
+import Button from "../Button/Button";
 
 type Props = {
   listName: string;
@@ -73,7 +73,7 @@ const List: React.FC<Props> = ({
         listName: listName,
         listDescription: listDescription,
         listings: listings,
-        localStorageId: listId,
+        listId: listId,
         ownerUserId: "localstorage",
       };
       const currentListsString = localStorage.getItem("lists");
@@ -83,8 +83,7 @@ const List: React.FC<Props> = ({
       } else {
         let currentLists = JSON.parse(currentListsString);
         const index = currentLists.findIndex(
-          (l: { localStorageId: string | undefined }) =>
-            l.localStorageId === listToSave.localStorageId
+          (l: { listId: string | undefined }) => l.listId === listToSave.listId
         );
         // if list already exists in local storage
         if (index !== -1) {
@@ -114,9 +113,7 @@ const List: React.FC<Props> = ({
         return;
       }
       let currentLists = JSON.parse(currentListsString);
-      currentLists = currentLists.filter(
-        (list: { localStorageId: string }) => list.localStorageId !== listId
-      );
+      currentLists = currentLists.filter((list: { listId: string }) => list.listId !== listId);
       const newListsString = JSON.stringify(currentLists);
       localStorage.setItem("lists", newListsString);
       router.push("/");
@@ -142,54 +139,47 @@ const List: React.FC<Props> = ({
                   rows={4}
                   placeholder="Description..."
                 />
-                <ListButton
-                  text="Finish Editing"
-                  Icon={CheckOutlined}
-                  onClick={() => setEditingList(false)}
-                  disabled={listName.length === 0}
-                />
+                <Button onClick={() => setEditingList(false)} disabled={listName.length === 0}>
+                  <CheckOutlined /> Finish Editing
+                </Button>
               </>
             ) : (
               <>
                 <h1 className={styles.listTitle}>{listName}</h1>
                 <p>{listDescription}</p>
-                <p>
-                  Created by user {ownerUsername} (send username in server response from /getlist)
+                <p className={styles.creator}>
+                  Created by{" "}
+                  {listLocation === "server"
+                    ? "send username in server response from /getlist"
+                    : "You (local storage)"}
                 </p>
               </>
             )}
           </div>
 
           <div className={styles.buttonSection}>
-            <ListButton
-              text="Save"
-              Icon={SaveOutlined}
-              onClick={saveList}
-              disabled={!listEdited || editingList}
-            />
-            <ListButton
-              text="Edit Details"
-              Icon={EditOutlined}
-              onClick={() => setEditingList(true)}
-              disabled={editingList}
-            />
-            <ListButton
-              text="Undo Changes"
-              Icon={UndoOutlined}
-              onClick={onRevertChanges}
-              disabled={!listEdited || editingList}
-            />
+            <Button onClick={saveList} disabled={!listEdited || editingList}>
+              <SaveOutlined /> Save
+            </Button>
+            <Button onClick={() => setEditingList(true)} disabled={editingList}>
+              <EditOutlined /> Edit Details
+            </Button>
+            <Button onClick={onRevertChanges} disabled={!listEdited || editingList}>
+              <UndoOutlined /> Undo Changes
+            </Button>
             {listLocation === "server" && (
-              <ListButton
-                text="Copy Link"
-                Icon={LinkOutlined}
+              <Button
                 onClick={() => {
                   navigator.clipboard.writeText(`htttp://localhost:3000/list/${listId}`);
                 }}
-              />
+              >
+                <LinkOutlined /> Copy Link
+              </Button>
             )}
 
-            <ListButton text="Delete" Icon={DeleteOutlined} onClick={deleteList} />
+            <Button onClick={deleteList}>
+              <DeleteOutlined /> Delete
+            </Button>
           </div>
         </div>
       }

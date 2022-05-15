@@ -1,21 +1,29 @@
 import React, { useState } from "react";
 import styles from "./SearchSection.module.css";
-import { SearchOutlined, Loading3QuartersOutlined, PlusCircleFilled } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  Loading3QuartersOutlined,
+  PlusCircleFilled,
+  PlusOutlined,
+} from "@ant-design/icons";
 import Listing from "../Listing/Listing";
 import ListingButton from "../ListingButton/ListingButton";
 import Container from "../Container/Container";
 import { ListingType } from "../ListPage/ListPage";
+import Button from "../Button/Button";
+import AddCustomListing from "../AddCustomListing/AddCustomListing";
 
 type Props = {
   onAddToList(listing: ListingType): void;
 };
 
-const SearchSection: React.FC<Props> = ({ onAddToList: addToList }) => {
+const SearchSection: React.FC<Props> = ({ onAddToList }) => {
   const [query, setQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<ListingType[]>([]);
   const [includeAdult, setIncludeAdult] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [noResults, setNoResults] = useState<boolean>(false);
+  const [addingCustomListing, setAddingCustomListing] = useState<boolean>(false);
 
   function fetchSearchResults() {
     if (query.length === 0) {
@@ -83,6 +91,7 @@ const SearchSection: React.FC<Props> = ({ onAddToList: addToList }) => {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search..."
             />
             <button type="submit" className={styles.searchButton}>
               <SearchOutlined />
@@ -96,6 +105,13 @@ const SearchSection: React.FC<Props> = ({ onAddToList: addToList }) => {
             />{" "}
             <p>Include Adult Content</p>
           </label>
+          {!addingCustomListing && (
+            <Button onClick={() => setAddingCustomListing(true)}>
+              <PlusOutlined /> Add Custom Movie
+            </Button>
+          )}
+
+          {addingCustomListing && <AddCustomListing onAddToList={onAddToList} />}
         </>
       }
       body={
@@ -116,7 +132,7 @@ const SearchSection: React.FC<Props> = ({ onAddToList: addToList }) => {
                     key={0}
                     Icon={PlusCircleFilled}
                     mouseOverText="Add To List"
-                    onClick={() => addToList(result)}
+                    onClick={() => onAddToList(result)}
                   />,
                 ]}
               />

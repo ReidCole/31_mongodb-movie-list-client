@@ -1,0 +1,15 @@
+.notification {
+  position: fixed;
+  bottom: 0;
+  padding: 0.7rem;
+  border-radius: 0.3rem;
+  box-shadow: 0 0.2rem 0.4rem black;
+  pointer-events: all;
+  transition: transform 0.4s cubic-bezier(0.075, 0.82, 0.165, 1);
+  transform: translateY(200%);
+  max-width: 20rem;
+  margin: 1rem;
+}
+.notification.open {
+  transform: translateY(0%);
+}

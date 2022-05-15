@@ -1,7 +1,7 @@
 .button {
   display: flex;
   flex-direction: row;
-  padding: 0.6rem 0.5rem;
+  padding: 0.6rem 0.8rem;
   align-items: center;
   justify-content: center;
   gap: 0.3rem;
@@ -10,6 +10,7 @@
   border: none;
   border-radius: 0.4rem;
   cursor: pointer;
+  min-width: max-content;
 }
 .button:hover,
 .button:focus {
@@ -19,11 +20,8 @@
 }
 .button:disabled {
   background-color: rgb(112, 110, 118);
+  cursor: auto;
 }
 .button:disabled:hover {
   color: white;
-}
-
-.icon {
-  font-size: 1rem;
 }

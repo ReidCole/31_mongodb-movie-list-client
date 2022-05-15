@@ -14,12 +14,12 @@ const ListLister: React.FC<Props> = ({ lists, heading, linkPrefix }) => {
     <Container
       header={<h2 className={styles.listTypeHeading}>{heading}</h2>}
       body={
-        <div className={styles.listTypeContainer}>
+        <div className={styles.lists}>
           {lists.length > 0 ? (
             lists.map((list) => (
-              <div key={list.listId}>
-                <Link href={`${linkPrefix}${list.listId}`}>{list.listName}</Link>
-              </div>
+              <Link key={list.listId} href={`${linkPrefix}${list.listId}`}>
+                <a className={styles.listLink}>{list.listName}</a>
+              </Link>
             ))
           ) : (
             <div>

@@ -9,10 +9,13 @@ import { PlusOutlined } from "@ant-design/icons";
 import ListLister from "../components/ListLister/ListLister";
 import Image from "next/image";
 import tmdbLogo from "../public/img/tmdb.svg";
+import Notification from "../components/Notification/Notification";
+import useNotificationState from "../hooks/useNotificationState";
 
 const Home: NextPage = () => {
   const [localStorageLists, setLocalStorageLists] = useState<ListType[]>([]);
   const [accountLists, setAccountLists] = useState<ListType[]>([]);
+  const [notificationState, showNotification] = useNotificationState();
 
   useEffect(() => {
     const lsLists = localStorage.getItem("lists");
@@ -30,6 +33,13 @@ const Home: NextPage = () => {
 
       <main>
         <Header />
+        <button
+          onClick={() =>
+            showNotification("cheese on a siojeowjfoiwejofi jwofjoiwejf owjoefj", "red")
+          }
+        >
+          show notification
+        </button>
 
         <Link href="/newlist">
           <a className={styles.createNewList}>
@@ -54,6 +64,8 @@ const Home: NextPage = () => {
             for movie and TV show search results.
           </p>
         </div>
+
+        <Notification state={notificationState} />
       </main>
     </>
   );

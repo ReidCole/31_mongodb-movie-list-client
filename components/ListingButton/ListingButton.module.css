@@ -18,3 +18,7 @@
   color: var(--clr-primary-h);
   outline: none;
 }
+.button:disabled {
+  color: rgb(112, 110, 118);
+  cursor: auto;
+}

@@ -64,6 +64,12 @@
   font-size: 1rem;
 }
 
+.creator {
+  margin-top: 0.3rem;
+  color: var(--clr-subtext);
+  font-size: 0.9rem;
+}
+
 @media (min-width: 500px) {
   .buttonSection {
     display: grid;

@@ -1,0 +1,10 @@
+.heading {
+  font-size: var(--heading-font-size);
+}
+
+.form {
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
