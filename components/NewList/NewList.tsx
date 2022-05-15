@@ -43,6 +43,7 @@ const NewList: React.FC<Props> = ({
       listDescription: listDescription,
       ownerUserId: "test",
       listings: listings,
+      listId: "",
     };
     axios
       .post("http://localhost:4000/createlist", newList)
@@ -60,7 +61,7 @@ const NewList: React.FC<Props> = ({
       listDescription: listDescription,
       ownerUserId: "localstorage",
       listings: listings,
-      localStorageId: nanoid(),
+      listId: nanoid(),
     };
     const currentListsString = localStorage.getItem("lists");
     if (currentListsString === null) {
@@ -73,7 +74,7 @@ const NewList: React.FC<Props> = ({
       const newListsString = JSON.stringify(currentLists);
       localStorage.setItem("lists", newListsString);
     }
-    router.push(`/local/${newList.localStorageId}`);
+    router.push(`/local/${newList.listId}`);
   }
 
   useEffect(() => {

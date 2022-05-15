@@ -28,14 +28,14 @@ const Sidebar: React.FC<Props> = ({ isOpen, setIsOpen }) => {
                 <HomeOutlined /> Home
               </a>
             </Link>
-            <Link href="/" passHref>
+            <Link href="/newlist" passHref>
               <a className={styles.link}>
                 <PlusOutlined /> New List
               </a>
             </Link>
-            <Link href="/" passHref>
+            <Link href="/login" passHref>
               <a className={styles.link}>
-                <UserOutlined /> Sign In
+                <UserOutlined /> Log In
               </a>
             </Link>
           </nav>

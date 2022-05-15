@@ -15,12 +15,14 @@ const SearchSection: React.FC<Props> = ({ onAddToList: addToList }) => {
   const [searchResults, setSearchResults] = useState<ListingType[]>([]);
   const [includeAdult, setIncludeAdult] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
+  const [noResults, setNoResults] = useState<boolean>(false);
 
   function fetchSearchResults() {
     if (query.length === 0) {
       console.error("search query length is 0");
       return;
     }
+    setNoResults(false);
     setLoading(true);
     fetch(
       `https://api.themoviedb.org/3/search/multi?api_key=1d4d3e32919168fb8e210e70ed956f24&language=en-US&query=${query}&page=1&include_adult=${
@@ -54,9 +56,12 @@ const SearchSection: React.FC<Props> = ({ onAddToList: addToList }) => {
             listings.push(listing);
           }
         );
-
-        setSearchResults(listings);
-        setLoading(false);
+        if (listings.length === 0) {
+          setNoResults(true);
+        } else {
+          setSearchResults(listings);
+          setLoading(false);
+        }
       });
   }
 
@@ -94,7 +99,9 @@ const SearchSection: React.FC<Props> = ({ onAddToList: addToList }) => {
         </>
       }
       body={
-        loading ? (
+        noResults ? (
+          <div className={styles.noSearchText}>No results were found</div>
+        ) : loading ? (
           <div className={styles.loadingDiv}>
             <Loading3QuartersOutlined className={styles.loadingIcon} />
           </div>
