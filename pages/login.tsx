@@ -6,24 +6,63 @@ import styles from "../styles/Login.module.css";
 import Container from "../components/Container/Container";
 import { useState } from "react";
 import Button from "../components/Button/Button";
+import useNotificationState from "../hooks/useNotificationState";
+import Notification from "../components/Notification/Notification";
 
 const Login: NextPage = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-
-  function createUser() {
-    axios.post("http://localhost:4000/createuser", {
-      username: "YourMom120",
-      password: "456",
-    });
-  }
+  const [notificationState, showNotification] = useNotificationState();
 
   function login() {
-    console.log("log in");
+    axios
+      .post("http://localhost:4000/login", {
+        username: username,
+        password: password,
+      })
+      .then((res) => {
+        const data = res.data;
+        console.log(res.data);
+      })
+      .catch((e) => {
+        let errorText = "s";
+        switch (e.response.status) {
+          case 404:
+            errorText = "No user with this username exists. Did you mean to sign up?";
+            break;
+          case 405:
+            errorText = "Incorrect password for this username";
+            break;
+          default:
+            errorText = "Something went wrong. Please try again later.";
+        }
+        showNotification("Error: " + errorText, "red");
+        console.error(e);
+      });
   }
 
   function signup() {
-    console.log("sign up");
+    axios
+      .post("http://localhost:4000/signup", {
+        username: username,
+        password: password,
+      })
+      .then((res) => {
+        const data = res.data;
+        console.log(res.data);
+      })
+      .catch((e) => {
+        let errorText = "s";
+        switch (e.response.status) {
+          case 409:
+            errorText = "This username is taken.";
+            break;
+          default:
+            errorText = "Something went wrong. Please try again later.";
+        }
+        showNotification("Error: " + errorText, "red");
+        console.error(e);
+      });
   }
 
   return (
@@ -58,16 +97,26 @@ const Login: NextPage = () => {
                 />
               </label>
               <div className={styles.buttons}>
-                <Button className={styles.button} onClick={login}>
+                <Button
+                  className={styles.button}
+                  onClick={login}
+                  disabled={username.length === 0 || password.length === 0}
+                >
                   Log In
                 </Button>
-                <Button className={styles.button} onClick={signup}>
+                <Button
+                  className={styles.button}
+                  onClick={signup}
+                  disabled={username.length === 0 || password.length === 0}
+                >
                   Sign Up
                 </Button>
               </div>
             </form>
           }
         />
+
+        <Notification state={notificationState} />
       </main>
     </>
   );

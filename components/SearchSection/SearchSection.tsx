@@ -14,6 +14,7 @@ import Button from "../Button/Button";
 import AddCustomListing from "../AddCustomListing/AddCustomListing";
 import useNotificationState from "../../hooks/useNotificationState";
 import Notification from "../Notification/Notification";
+import axios from "axios";
 
 type Props = {
   onAddToList(listing: ListingType): void;
@@ -31,10 +32,11 @@ const SearchSection: React.FC<Props> = ({ onAddToList }) => {
     if (query.length === 0) return console.error("search query length is 0");
     setNoResults(false);
     setLoading(true);
-    fetch(`http://localhost:4000/searchmovies/${query}`)
-      .then((res) => res.json())
-      .then((json) => {
-        if (typeof json.results === "undefined") {
+    axios
+      .get(`http://localhost:4000/searchmovies/${query}`)
+      .then((res) => {
+        const data = res.data;
+        if (typeof data.results === "undefined") {
           showNotification(
             "Error: Couldn't reach The Movie DB servers. Please try again later.",
             "red"
@@ -44,7 +46,7 @@ const SearchSection: React.FC<Props> = ({ onAddToList }) => {
           return console.error("results returned undefined");
         }
         let listings: ListingType[] = [];
-        json.results.map(
+        data.results.map(
           (result: {
             id: number;
             title: string;
