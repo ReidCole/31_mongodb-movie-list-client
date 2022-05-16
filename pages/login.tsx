@@ -5,6 +5,7 @@ import Header from "../components/Header/Header";
 import styles from "../styles/Login.module.css";
 import Container from "../components/Container/Container";
 import { useState } from "react";
+import Button from "../components/Button/Button";
 
 const Login: NextPage = () => {
   const [username, setUsername] = useState<string>("");
@@ -15,6 +16,14 @@ const Login: NextPage = () => {
       username: "YourMom120",
       password: "456",
     });
+  }
+
+  function login() {
+    console.log("log in");
+  }
+
+  function signup() {
+    console.log("sign up");
   }
 
   return (
@@ -29,21 +38,33 @@ const Login: NextPage = () => {
         <Container
           header={<h2 className={styles.heading}>Log In / Sign Up</h2>}
           body={
-            <form className={styles.form}>
-              <label>
+            <form onSubmit={(e) => e.preventDefault()} className={styles.form}>
+              <label className={styles.label}>
                 <p>Username</p>
-                <input value={username} onChange={(e) => setUsername(e.target.value)} type="text" />
+                <input
+                  className={styles.input}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  type="text"
+                />
               </label>
-              <label>
+              <label className={styles.label}>
                 <p>Password</p>
                 <input
+                  className={styles.input}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   type="password"
                 />
               </label>
-              <button>Log In</button>
-              <button>Sign Up</button>
+              <div className={styles.buttons}>
+                <Button className={styles.button} onClick={login}>
+                  Log In
+                </Button>
+                <Button className={styles.button} onClick={signup}>
+                  Sign Up
+                </Button>
+              </div>
             </form>
           }
         />

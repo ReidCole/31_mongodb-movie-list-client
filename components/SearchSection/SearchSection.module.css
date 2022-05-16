@@ -44,6 +44,7 @@
   background: blue;
   border-radius: 1rem;
   overflow: hidden;
+  margin-bottom: 1rem;
 }
 
 .searchInput {
@@ -91,20 +92,6 @@
   padding: 1rem;
   color: var(--clr-subtext);
   font-weight: bold;
-}
-
-.adultContentLabel {
-  cursor: pointer;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.2rem;
-}
-.adultContentLabel > p {
-  user-select: none;
-}
-.adultContentLabel > input {
-  cursor: pointer;
 }
 
 @keyframes loadingSpin {

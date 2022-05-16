@@ -12,6 +12,8 @@ import Container from "../Container/Container";
 import { ListingType } from "../ListPage/ListPage";
 import Button from "../Button/Button";
 import AddCustomListing from "../AddCustomListing/AddCustomListing";
+import useNotificationState from "../../hooks/useNotificationState";
+import Notification from "../Notification/Notification";
 
 type Props = {
   onAddToList(listing: ListingType): void;
@@ -20,26 +22,27 @@ type Props = {
 const SearchSection: React.FC<Props> = ({ onAddToList }) => {
   const [query, setQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<ListingType[]>([]);
-  const [includeAdult, setIncludeAdult] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [noResults, setNoResults] = useState<boolean>(false);
   const [addingCustomListing, setAddingCustomListing] = useState<boolean>(false);
+  const [notificationState, showNotification] = useNotificationState();
 
   function fetchSearchResults() {
-    if (query.length === 0) {
-      console.error("search query length is 0");
-      return;
-    }
+    if (query.length === 0) return console.error("search query length is 0");
     setNoResults(false);
     setLoading(true);
-    fetch(
-      `https://api.themoviedb.org/3/search/multi?api_key=1d4d3e32919168fb8e210e70ed956f24&language=en-US&query=${query}&page=1&include_adult=${
-        includeAdult ? "true" : "false"
-      }`
-    )
+    fetch(`http://localhost:4000/searchmovies/${query}`)
       .then((res) => res.json())
       .then((json) => {
-        console.log(json.results);
+        if (typeof json.results === "undefined") {
+          showNotification(
+            "Error: Couldn't reach The Movie DB servers. Please try again later.",
+            "red"
+          );
+          setLoading(false);
+          setNoResults(true);
+          return console.error("results returned undefined");
+        }
         let listings: ListingType[] = [];
         json.results.map(
           (result: {
@@ -70,79 +73,81 @@ const SearchSection: React.FC<Props> = ({ onAddToList }) => {
           setSearchResults(listings);
           setLoading(false);
         }
+      })
+      .catch((e) => {
+        console.error(e);
+        showNotification("Error: " + e.message, "red");
+        setLoading(false);
+        setNoResults(true);
       });
   }
 
   return (
-    <Container
-      header={
-        <>
-          <h2 className={styles.heading}>Search for Movies and TV Shows</h2>
+    <>
+      <Container
+        header={
+          <>
+            <h2 className={styles.heading}>Search for Movies and TV Shows</h2>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              fetchSearchResults();
-            }}
-            className={styles.searchForm}
-          >
-            <input
-              className={styles.searchInput}
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search..."
-            />
-            <button type="submit" className={styles.searchButton}>
-              <SearchOutlined />
-            </button>
-          </form>
-          <label className={styles.adultContentLabel}>
-            <input
-              type="checkbox"
-              checked={includeAdult}
-              onChange={(e) => setIncludeAdult(e.target.checked)}
-            />{" "}
-            <p>Include Adult Content</p>
-          </label>
-          {!addingCustomListing && (
-            <Button onClick={() => setAddingCustomListing(true)}>
-              <PlusOutlined /> Add Custom Movie
-            </Button>
-          )}
-
-          {addingCustomListing && <AddCustomListing onAddToList={onAddToList} />}
-        </>
-      }
-      body={
-        noResults ? (
-          <div className={styles.noSearchText}>No results were found</div>
-        ) : loading ? (
-          <div className={styles.loadingDiv}>
-            <Loading3QuartersOutlined className={styles.loadingIcon} />
-          </div>
-        ) : searchResults.length > 0 ? (
-          <div className={styles.list}>
-            {searchResults.map((result) => (
-              <Listing
-                key={result.movieDbId}
-                listing={result}
-                buttons={[
-                  <ListingButton
-                    key={0}
-                    Icon={PlusCircleFilled}
-                    mouseOverText="Add To List"
-                    onClick={() => onAddToList(result)}
-                  />,
-                ]}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                fetchSearchResults();
+              }}
+              className={styles.searchForm}
+            >
+              <input
+                className={styles.searchInput}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search..."
               />
-            ))}
-          </div>
-        ) : (
-          <div className={styles.noSearchText}>Search results will appear here</div>
-        )
-      }
-    />
+              <button type="submit" className={styles.searchButton}>
+                <SearchOutlined />
+              </button>
+            </form>
+
+            {!addingCustomListing && (
+              <Button onClick={() => setAddingCustomListing(true)}>
+                <PlusOutlined /> Add Custom Movie
+              </Button>
+            )}
+
+            {addingCustomListing && <AddCustomListing onAddToList={onAddToList} />}
+          </>
+        }
+        body={
+          noResults ? (
+            <div className={styles.noSearchText}>No results were found</div>
+          ) : loading ? (
+            <div className={styles.loadingDiv}>
+              <Loading3QuartersOutlined className={styles.loadingIcon} />
+            </div>
+          ) : searchResults.length > 0 ? (
+            <div className={styles.list}>
+              {searchResults.map((result) => (
+                <Listing
+                  key={result.movieDbId}
+                  listing={result}
+                  buttons={[
+                    <ListingButton
+                      key={0}
+                      Icon={PlusCircleFilled}
+                      mouseOverText="Add To List"
+                      onClick={() => onAddToList(result)}
+                    />,
+                  ]}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className={styles.noSearchText}>Search results will appear here</div>
+          )
+        }
+      />
+      <Notification state={notificationState} />
+    </>
   );
 };
 

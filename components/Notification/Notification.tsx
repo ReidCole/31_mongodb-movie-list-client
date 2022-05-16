@@ -31,11 +31,9 @@ const Notification: React.FC<Props> = ({ state }) => {
           }
         `}
       </style>
-      <p>{isOpen ? state.text : ""}</p>
+      <p>{state.text}</p>
     </div>
   );
 };
 
 export default Notification;
-
-// make hook that exports [showNotification, notificationState]
