@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Header from "../Header/Header";
 import List from "../List/List";
 import SearchSection from "../SearchSection/SearchSection";
+import styles from "./ListPage.module.css";
 
 type Props = {
   listLocation: "localStorage" | "server";
@@ -15,7 +16,7 @@ export type ListType = {
   listName: string;
   listDescription: string;
   listings: ListingType[];
-  ownerUserId: string;
+  ownerUsername: string;
   listId: string;
 };
 
@@ -39,7 +40,6 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
   const [listName, setListName] = useState("");
   const [listDescription, setListDescription] = useState("");
   const [listings, setListings] = useState<ListingType[]>([]);
-  const [ownerUserId, setOwnerUserId] = useState("");
   const [ownerUsername, setOwnerUsername] = useState("");
   const [listId, setListId] = useState("");
   const [errorGettingList, setErrorGettingList] = useState<string>("");
@@ -85,7 +85,7 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
           setListName(data.listName);
           setListDescription(data.listDescription);
           setListings(data.listings);
-          setOwnerUserId(data.ownerUserId ? data.ownerUserId : "fix later");
+          setOwnerUsername(data.ownerUsername);
           setListId(data._id);
 
           setUnchangedValues({
@@ -95,12 +95,27 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
           });
         })
         .catch((e) => {
-          if (e.response.status == 404) {
-            console.error("No list with this id could be found in the database");
-            setErrorGettingList("No list with this id could be found in the server database");
-          } else {
-            console.error(e.message);
+          console.log(e.response.status);
+          let errorText = "";
+          switch (e.response.status) {
+            case 404:
+              errorText =
+                "No list with this ID could be found in the server database. It may have been deleted.";
+              break;
+            case 500:
+              errorText =
+                "Invalid list ID format. The list ID in the URL should be 24 hexadecimal characters.";
+              break;
+            case 0:
+              errorText =
+                "Couldn't connect to the server. It may be offline right now. Please try again later.";
+              break;
+            default:
+              errorText = "Something went wrong. Please try again later.";
+              break;
           }
+          console.error(e.message);
+          setErrorGettingList(errorText);
         });
     } else {
       const lsListsString = localStorage.getItem("lists");
@@ -123,7 +138,7 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
             listDescription: list.listDescription,
             listings: list.listings,
             listId: list.listId,
-            ownerUserId: "localstorage",
+            ownerUsername: "localstorage",
           };
           return l;
         }
@@ -141,7 +156,7 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
       setListName(thisList.listName);
       setListDescription(thisList.listDescription);
       setListings(thisList.listings);
-      setOwnerUserId("You (local storage)");
+      setOwnerUsername("You (local storage)");
       setListId(thisList.listId);
       setUnchangedValues({
         listName: thisList.listName,
@@ -162,7 +177,18 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
     setListEdited(!isSame);
   }, [listName, listDescription, listings, unchangedValues]);
 
-  if (errorGettingList.length > 0) return <div>{errorGettingList}</div>;
+  if (errorGettingList.length > 0)
+    return (
+      <>
+        <Head>
+          <title>Error - Movie List Maker</title>
+        </Head>
+        <main>
+          <Header />
+          <p className={styles.errorMsg}>Error: {errorGettingList}</p>
+        </main>
+      </>
+    );
 
   if (listings.length === 0) return <div>Loading...</div>;
 

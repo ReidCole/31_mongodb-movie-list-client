@@ -4,65 +4,38 @@ import axios from "axios";
 import Header from "../components/Header/Header";
 import styles from "../styles/Login.module.css";
 import Container from "../components/Container/Container";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Button from "../components/Button/Button";
 import useNotificationState from "../hooks/useNotificationState";
 import Notification from "../components/Notification/Notification";
+import { AuthContext } from "../context/AuthContext";
+import { useRouter } from "next/router";
 
 const Login: NextPage = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [notificationState, showNotification] = useNotificationState();
+  const auth = useContext(AuthContext);
+  const router = useRouter();
+  const prevRoute = router.query.prevRoute?.toString() || null;
 
-  function login() {
-    axios
-      .post("http://localhost:4000/login", {
-        username: username,
-        password: password,
-      })
-      .then((res) => {
-        const data = res.data;
-        console.log(res.data);
-      })
-      .catch((e) => {
-        let errorText = "s";
-        switch (e.response.status) {
-          case 404:
-            errorText = "No user with this username exists. Did you mean to sign up?";
-            break;
-          case 405:
-            errorText = "Incorrect password for this username";
-            break;
-          default:
-            errorText = "Something went wrong. Please try again later.";
-        }
-        showNotification("Error: " + errorText, "red");
-        console.error(e);
-      });
-  }
-
-  function signup() {
-    axios
-      .post("http://localhost:4000/signup", {
-        username: username,
-        password: password,
-      })
-      .then((res) => {
-        const data = res.data;
-        console.log(res.data);
-      })
-      .catch((e) => {
-        let errorText = "s";
-        switch (e.response.status) {
-          case 409:
-            errorText = "This username is taken.";
-            break;
-          default:
-            errorText = "Something went wrong. Please try again later.";
-        }
-        showNotification("Error: " + errorText, "red");
-        console.error(e);
-      });
+  function authenticate(method: "login" | "signup") {
+    if (prevRoute === null || auth === null) return;
+    if (method === "login") {
+      auth.login(
+        username,
+        password,
+        () => router.push(prevRoute),
+        (msg) => showNotification(msg, "red")
+      );
+    } else {
+      auth.signup(
+        username,
+        password,
+        () => router.push(prevRoute),
+        (msg) => showNotification(msg, "red")
+      );
+    }
   }
 
   return (
@@ -99,14 +72,14 @@ const Login: NextPage = () => {
               <div className={styles.buttons}>
                 <Button
                   className={styles.button}
-                  onClick={login}
+                  onClick={() => authenticate("login")}
                   disabled={username.length === 0 || password.length === 0}
                 >
                   Log In
                 </Button>
                 <Button
                   className={styles.button}
-                  onClick={signup}
+                  onClick={() => authenticate("signup")}
                   disabled={username.length === 0 || password.length === 0}
                 >
                   Sign Up

@@ -11,11 +11,12 @@ import {
 } from "@ant-design/icons";
 import Listing from "../Listing/Listing";
 import Container from "../Container/Container";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { ListingType, ListType } from "../ListPage/ListPage";
 import Button from "../Button/Button";
+import { AuthContext } from "../../context/AuthContext";
 
 type Props = {
   listName: string;
@@ -50,6 +51,7 @@ const List: React.FC<Props> = ({
 }) => {
   const router = useRouter();
   const [editingList, setEditingList] = useState(false);
+  const auth = useContext(AuthContext);
 
   function saveList() {
     console.log("save list", listId);
@@ -74,7 +76,7 @@ const List: React.FC<Props> = ({
         listDescription: listDescription,
         listings: listings,
         listId: listId,
-        ownerUserId: "localstorage",
+        ownerUsername: "localstorage",
       };
       const currentListsString = localStorage.getItem("lists");
       if (currentListsString === null) {
@@ -147,40 +149,37 @@ const List: React.FC<Props> = ({
               <>
                 <h1 className={styles.listTitle}>{listName}</h1>
                 <p>{listDescription}</p>
-                <p className={styles.creator}>
-                  Created by{" "}
-                  {listLocation === "server"
-                    ? "send username in server response from /getlist"
-                    : "You (local storage)"}
-                </p>
+                <p className={styles.creator}>Created by {ownerUsername}</p>
               </>
             )}
           </div>
 
-          <div className={styles.buttonSection}>
-            <Button onClick={saveList} disabled={!listEdited || editingList}>
-              <SaveOutlined /> Save
-            </Button>
-            <Button onClick={() => setEditingList(true)} disabled={editingList}>
-              <EditOutlined /> Edit Details
-            </Button>
-            <Button onClick={onRevertChanges} disabled={!listEdited || editingList}>
-              <UndoOutlined /> Undo Changes
-            </Button>
-            {listLocation === "server" && (
-              <Button
-                onClick={() => {
-                  navigator.clipboard.writeText(`htttp://localhost:3000/list/${listId}`);
-                }}
-              >
-                <LinkOutlined /> Copy Link
+          {auth && auth.username === ownerUsername && (
+            <div className={styles.buttonSection}>
+              <Button onClick={saveList} disabled={!listEdited || editingList}>
+                <SaveOutlined /> Save
               </Button>
-            )}
+              <Button onClick={() => setEditingList(true)} disabled={editingList}>
+                <EditOutlined /> Edit Details
+              </Button>
+              <Button onClick={onRevertChanges} disabled={!listEdited || editingList}>
+                <UndoOutlined /> Undo Changes
+              </Button>
+              {listLocation === "server" && (
+                <Button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`http://localhost:3000/list/${listId}`);
+                  }}
+                >
+                  <LinkOutlined /> Copy Link
+                </Button>
+              )}
 
-            <Button onClick={deleteList}>
-              <DeleteOutlined /> Delete
-            </Button>
-          </div>
+              <Button onClick={deleteList}>
+                <DeleteOutlined /> Delete
+              </Button>
+            </div>
+          )}
         </div>
       }
       body={
@@ -189,14 +188,18 @@ const List: React.FC<Props> = ({
             <Listing
               key={listing.idWithinList}
               listing={listing}
-              buttons={[
-                <ListingButton
-                  key={0}
-                  Icon={MinusCircleFilled}
-                  mouseOverText="Remove From List"
-                  onClick={() => onRemoveFromList(listing)}
-                />,
-              ]}
+              buttons={
+                auth && auth.username === ownerUsername
+                  ? [
+                      <ListingButton
+                        key={0}
+                        Icon={MinusCircleFilled}
+                        mouseOverText="Remove From List"
+                        onClick={() => onRemoveFromList(listing)}
+                      />,
+                    ]
+                  : []
+              }
             />
           ))}
         </div>

@@ -39,3 +39,13 @@
   color: var(--clr-primary-h);
   text-decoration: underline;
 }
+
+.containerHeading {
+  font-size: var(--heading-font-size);
+}
+
+.loginText {
+  padding: 1rem;
+  color: var(--clr-subtext);
+  font-weight: bold;
+}

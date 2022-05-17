@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import styles from "../styles/Home.module.css";
 import { ListType } from "../components/ListPage/ListPage";
@@ -11,11 +11,13 @@ import Image from "next/image";
 import tmdbLogo from "../public/img/tmdb.svg";
 import Notification from "../components/Notification/Notification";
 import useNotificationState from "../hooks/useNotificationState";
+import { AuthContext } from "../context/AuthContext";
+import Container from "../components/Container/Container";
 
 const Home: NextPage = () => {
   const [localStorageLists, setLocalStorageLists] = useState<ListType[]>([]);
   const [accountLists, setAccountLists] = useState<ListType[]>([]);
-  const [notificationState, showNotification] = useNotificationState();
+  const auth = useContext(AuthContext);
 
   useEffect(() => {
     const lsLists = localStorage.getItem("lists");
@@ -33,13 +35,6 @@ const Home: NextPage = () => {
 
       <main>
         <Header />
-        <button
-          onClick={() =>
-            showNotification("cheese on a siojeowjfoiwejofi jwofjoiwejf owjoefj", "red")
-          }
-        >
-          show notification
-        </button>
 
         <Link href="/newlist">
           <a className={styles.createNewList}>
@@ -48,7 +43,18 @@ const Home: NextPage = () => {
         </Link>
 
         <ListLister lists={localStorageLists} heading="Local Storage Lists" linkPrefix="/local/" />
-        <ListLister lists={accountLists} heading="Account Lists" linkPrefix="/list/" />
+        {auth && auth.username ? (
+          <ListLister lists={accountLists} heading="Account Lists" linkPrefix="/list/" />
+        ) : (
+          <Container
+            header={<h2 className={styles.containerHeading}>Account Lists</h2>}
+            body={
+              <p className={styles.loginText}>
+                Please log in to an account to save lists to the server
+              </p>
+            }
+          />
+        )}
 
         <div className={styles.tmdb}>
           <Link href="https://www.themoviedb.org/" passHref>
@@ -64,8 +70,6 @@ const Home: NextPage = () => {
             for movie and TV show search results.
           </p>
         </div>
-
-        <Notification state={notificationState} />
       </main>
     </>
   );

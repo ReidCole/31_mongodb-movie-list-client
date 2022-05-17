@@ -2,12 +2,15 @@ import { MinusCircleFilled, UserOutlined, DownloadOutlined, UndoOutlined } from 
 import axios from "axios";
 import { nanoid } from "nanoid";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ListingType, ListType } from "../../components/ListPage/ListPage";
+import { AuthContext } from "../../context/AuthContext";
+import useNotificationState from "../../hooks/useNotificationState";
 import Button from "../Button/Button";
 import Container from "../Container/Container";
 import Listing from "../Listing/Listing";
 import ListingButton from "../ListingButton/ListingButton";
+import Notification from "../Notification/Notification";
 import styles from "./NewList.module.css";
 
 type Props = {
@@ -31,8 +34,11 @@ const NewList: React.FC<Props> = ({
 }) => {
   const router = useRouter();
   const [canSave, setCanSave] = useState<boolean>(false);
+  const [notificationState, showNotification] = useNotificationState();
+  const auth = useContext(AuthContext);
 
   function saveToAccount() {
+    if (auth === null || auth.username == null) return;
     if (!canSave) {
       console.error("error validating list. make sure all required fields are filled in");
       return;
@@ -41,13 +47,17 @@ const NewList: React.FC<Props> = ({
     const newList: ListType = {
       listName: listName,
       listDescription: listDescription,
-      ownerUserId: "test",
+      ownerUsername: auth.username,
       listings: listings,
       listId: "",
     };
     axios
       .post("http://localhost:4000/createlist", newList)
-      .then((res) => router.push(`/list/${res.data}`));
+      .then((res) => router.push(`/list/${res.data}`))
+      .catch((e) => {
+        showNotification("Error: Something went wrong. Please try again later.", "red");
+        console.error(e.message);
+      });
   }
 
   function saveToLocalStorage() {
@@ -59,7 +69,7 @@ const NewList: React.FC<Props> = ({
     const newList: ListType = {
       listName: listName,
       listDescription: listDescription,
-      ownerUserId: "localstorage",
+      ownerUsername: "localstorage",
       listings: listings,
       listId: nanoid(),
     };
@@ -86,62 +96,72 @@ const NewList: React.FC<Props> = ({
   }, [listName, listings]);
 
   return (
-    <Container
-      header={
-        <>
-          <h2 className={styles.heading}>New List</h2>
-          <div className={styles.detailsSection}>
-            <input
-              className={styles.editTitle}
-              type="text"
-              value={listName}
-              placeholder="Name..."
-              onChange={(e) => setListName(e.target.value)}
-            />
-            <textarea
-              className={styles.editDescription}
-              value={listDescription}
-              onChange={(e) => setListDescription(e.target.value)}
-              rows={4}
-              placeholder="Description..."
-            />
-          </div>
-          <div className={styles.buttonSection}>
-            <Button onClick={saveToAccount} disabled={!canSave}>
-              <UserOutlined /> Save to Account
-            </Button>
-            <Button onClick={saveToLocalStorage} disabled={!canSave}>
-              <DownloadOutlined /> Save to Local Storage
-            </Button>
-            <Button onClick={() => setListings([])} disabled={!canSave}>
-              <UndoOutlined /> Reset
-            </Button>
-          </div>
-        </>
-      }
-      body={
-        listings.length > 0 ? (
-          <div className={styles.list}>
-            {listings.map((listing) => (
-              <Listing
-                key={listing.idWithinList}
-                listing={listing}
-                buttons={[
-                  <ListingButton
-                    key={0}
-                    Icon={MinusCircleFilled}
-                    mouseOverText="Remove From List"
-                    onClick={() => onRemoveFromList(listing)}
-                  />,
-                ]}
+    <>
+      <Container
+        header={
+          <>
+            <h2 className={styles.heading}>New List</h2>
+            <div className={styles.detailsSection}>
+              <input
+                className={styles.editTitle}
+                type="text"
+                value={listName}
+                placeholder="Name..."
+                onChange={(e) => setListName(e.target.value)}
               />
-            ))}
-          </div>
-        ) : (
-          <p className={styles.emptyListText}>Movies and shows in your list will appear here</p>
-        )
-      }
-    />
+              <textarea
+                className={styles.editDescription}
+                value={listDescription}
+                onChange={(e) => setListDescription(e.target.value)}
+                rows={4}
+                placeholder="Description..."
+              />
+            </div>
+            <div className={styles.buttonSection}>
+              {auth && auth.username ? (
+                <Button onClick={saveToAccount} disabled={!canSave}>
+                  <UserOutlined /> Save to Account
+                </Button>
+              ) : (
+                <Button onClick={() => {}} disabled={true}>
+                  Log in to save to server
+                </Button>
+              )}
+
+              <Button onClick={saveToLocalStorage} disabled={!canSave}>
+                <DownloadOutlined /> Save to Local Storage
+              </Button>
+              <Button onClick={() => setListings([])} disabled={!canSave}>
+                <UndoOutlined /> Reset
+              </Button>
+            </div>
+          </>
+        }
+        body={
+          listings.length > 0 ? (
+            <div className={styles.list}>
+              {listings.map((listing) => (
+                <Listing
+                  key={listing.idWithinList}
+                  listing={listing}
+                  buttons={[
+                    <ListingButton
+                      key={0}
+                      Icon={MinusCircleFilled}
+                      mouseOverText="Remove From List"
+                      onClick={() => onRemoveFromList(listing)}
+                    />,
+                  ]}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className={styles.emptyListText}>Movies and shows in your list will appear here</p>
+          )
+        }
+      />
+      <Notification state={notificationState} />
+    </>
   );
 };
 
