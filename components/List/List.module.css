@@ -70,6 +70,12 @@
   font-size: 0.9rem;
 }
 
+.reorderText {
+  color: var(--clr-subtext);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 @media (min-width: 500px) {
   .buttonSection {
     display: grid;

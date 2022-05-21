@@ -1,6 +1,14 @@
-import { ArrowRightOutlined, HomeOutlined, PlusOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  ArrowRightOutlined,
+  HomeOutlined,
+  LogoutOutlined,
+  PlusOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import styles from "./Sidebar.module.css";
 
 type Props = {
@@ -9,6 +17,8 @@ type Props = {
 };
 
 const Sidebar: React.FC<Props> = ({ isOpen, setIsOpen }) => {
+  const auth = useContext(AuthContext);
+
   if (isOpen)
     return (
       <div>
@@ -34,11 +44,17 @@ const Sidebar: React.FC<Props> = ({ isOpen, setIsOpen }) => {
                 <PlusOutlined /> New List
               </a>
             </Link>
-            <Link href={"/login"} passHref>
-              <a className={styles.link}>
-                <UserOutlined /> Log In
-              </a>
-            </Link>
+            {auth && auth.username ? (
+              <button className={styles.link} onClick={auth.logout}>
+                <LogoutOutlined /> Log Out
+              </button>
+            ) : (
+              <Link href={"/login"} passHref>
+                <a className={styles.link}>
+                  <UserOutlined /> Log In
+                </a>
+              </Link>
+            )}
           </nav>
         </div>
       </div>

@@ -57,6 +57,10 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 1.2rem;
+  border: none;
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
 }
 .link:hover,
 .link:focus {

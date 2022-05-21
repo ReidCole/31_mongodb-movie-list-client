@@ -155,7 +155,7 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
       setListName(thisList.listName);
       setListDescription(thisList.listDescription);
       setListings(thisList.listings);
-      setOwnerUsername("You (local storage)");
+      setOwnerUsername("you (local storage)");
       setListId(thisList.listId);
       setUnchangedValues({
         listName: thisList.listName,

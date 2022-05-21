@@ -11,7 +11,7 @@ import {
 } from "@ant-design/icons";
 import Listing from "../Listing/Listing";
 import Container from "../Container/Container";
-import { useContext, useState } from "react";
+import { DragEvent, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { ListingType, ListType } from "../ListPage/ListPage";
@@ -51,7 +51,21 @@ const List: React.FC<Props> = ({
 }) => {
   const router = useRouter();
   const [editingList, setEditingList] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
   const auth = useContext(AuthContext);
+  const [listingBeingReordered, setListingBeingReordered] = useState<ListingType | null>(null);
+
+  useEffect(() => {
+    if (listLocation === "localStorage") {
+      setCanEdit(true);
+      return;
+    }
+
+    if (auth === null) return;
+
+    const isOwner = auth.username === ownerUsername;
+    setCanEdit(isOwner);
+  }, [auth, listLocation, ownerUsername]);
 
   function saveList() {
     if (auth === null) return;
@@ -128,6 +142,26 @@ const List: React.FC<Props> = ({
     }
   }
 
+  function onDropListing(e: DragEvent<HTMLDivElement>, index: number) {
+    e.preventDefault();
+    const draggedItemString = e.dataTransfer.getData("listing");
+    if (draggedItemString === "") return;
+    const draggedItem: ListingType = JSON.parse(draggedItemString);
+    const prevIndex = listings.findIndex((i) => i.idWithinList === draggedItem.idWithinList);
+    console.log("previndex", prevIndex);
+    let listWithoutPrev = listings.slice();
+    listWithoutPrev.splice(prevIndex, 1);
+    console.log("listwithoutprev", listWithoutPrev);
+    const newIndex = index;
+    console.log("newindex", newIndex);
+    const firstHalf = listWithoutPrev.slice(0, newIndex);
+    const secondHalf = listWithoutPrev.slice(newIndex, listWithoutPrev.length);
+    console.log("halves", firstHalf, secondHalf);
+    const finalList = [...firstHalf, draggedItem, ...secondHalf];
+    console.log("final", finalList);
+    setListings(finalList);
+  }
+
   return (
     <Container
       header={
@@ -160,42 +194,45 @@ const List: React.FC<Props> = ({
             )}
           </div>
 
-          {auth && auth.username === ownerUsername && (
-            <div className={styles.buttonSection}>
-              <Button onClick={saveList} disabled={!listEdited || editingList}>
-                <SaveOutlined /> Save
-              </Button>
-              <Button onClick={() => setEditingList(true)} disabled={editingList}>
-                <EditOutlined /> Edit Details
-              </Button>
-              <Button onClick={onRevertChanges} disabled={!listEdited || editingList}>
-                <UndoOutlined /> Undo Changes
-              </Button>
-              {listLocation === "server" && (
-                <Button
-                  onClick={() => {
-                    navigator.clipboard.writeText(`http://localhost:3000/list/${listId}`);
-                  }}
-                >
-                  <LinkOutlined /> Copy Link
+          {canEdit && (
+            <>
+              <div className={styles.buttonSection}>
+                <Button onClick={saveList} disabled={!listEdited || editingList}>
+                  <SaveOutlined /> Save
                 </Button>
-              )}
+                <Button onClick={() => setEditingList(true)} disabled={editingList}>
+                  <EditOutlined /> Edit Details
+                </Button>
+                <Button onClick={onRevertChanges} disabled={!listEdited || editingList}>
+                  <UndoOutlined /> Undo Changes
+                </Button>
+                {listLocation === "server" && (
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`http://localhost:3000/list/${listId}`);
+                    }}
+                  >
+                    <LinkOutlined /> Copy Link
+                  </Button>
+                )}
 
-              <Button onClick={deleteList}>
-                <DeleteOutlined /> Delete
-              </Button>
-            </div>
+                <Button onClick={deleteList}>
+                  <DeleteOutlined /> Delete
+                </Button>
+              </div>
+              <p className={styles.reorderText}>Drag and drop movies to re-order them.</p>
+            </>
           )}
         </div>
       }
       body={
         <div className={styles.list}>
-          {listings.map((listing) => (
+          {listings.map((listing, index) => (
             <Listing
               key={listing.idWithinList}
               listing={listing}
               buttons={
-                auth && auth.username === ownerUsername
+                canEdit
                   ? [
                       <ListingButton
                         key={0}
@@ -206,6 +243,21 @@ const List: React.FC<Props> = ({
                     ]
                   : []
               }
+              canReorder={true}
+              onDragStart={(e) => {
+                const draggedItemString = JSON.stringify(listing);
+                e.dataTransfer.setData("listing", draggedItemString);
+                setListingBeingReordered(listing);
+              }}
+              onDragOver={(e) => {
+                if (
+                  listingBeingReordered &&
+                  listingBeingReordered.idWithinList !== listing.idWithinList
+                ) {
+                  e.preventDefault();
+                }
+              }}
+              onDrop={(e) => onDropListing(e, index)}
             />
           ))}
         </div>
