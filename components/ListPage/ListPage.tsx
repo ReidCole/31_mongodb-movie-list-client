@@ -95,7 +95,6 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
           });
         })
         .catch((e) => {
-          console.log(e.response.status);
           let errorText = "";
           switch (e.response.status) {
             case 404:

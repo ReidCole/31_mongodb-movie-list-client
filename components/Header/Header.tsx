@@ -40,7 +40,7 @@ const Header: React.FC = () => {
               <LogoutOutlined /> Log Out
             </button>
           ) : (
-            <Link href={`/login?prevRoute=${router.asPath}`} passHref>
+            <Link href="/login" passHref>
               <a className={styles.link}>
                 <UserOutlined /> Log In
               </a>

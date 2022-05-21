@@ -17,22 +17,21 @@ const Login: NextPage = () => {
   const [notificationState, showNotification] = useNotificationState();
   const auth = useContext(AuthContext);
   const router = useRouter();
-  const prevRoute = router.query.prevRoute?.toString() || null;
 
   function authenticate(method: "login" | "signup") {
-    if (prevRoute === null || auth === null) return;
+    if (auth === null) return;
     if (method === "login") {
       auth.login(
         username,
         password,
-        () => router.push(prevRoute),
+        () => router.push("/"),
         (msg) => showNotification(msg, "red")
       );
     } else {
       auth.signup(
         username,
         password,
-        () => router.push(prevRoute),
+        () => router.push("/"),
         (msg) => showNotification(msg, "red")
       );
     }

@@ -1,5 +1,6 @@
 import { ArrowRightOutlined, HomeOutlined, PlusOutlined, UserOutlined } from "@ant-design/icons";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import styles from "./Sidebar.module.css";
 
 type Props = {
@@ -33,7 +34,7 @@ const Sidebar: React.FC<Props> = ({ isOpen, setIsOpen }) => {
                 <PlusOutlined /> New List
               </a>
             </Link>
-            <Link href="/login" passHref>
+            <Link href={"/login"} passHref>
               <a className={styles.link}>
                 <UserOutlined /> Log In
               </a>

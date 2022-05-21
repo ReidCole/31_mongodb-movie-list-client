@@ -54,6 +54,8 @@ const List: React.FC<Props> = ({
   const auth = useContext(AuthContext);
 
   function saveList() {
+    if (auth === null) return;
+
     console.log("save list", listId);
     if (listLocation === "server") {
       const data = {
@@ -62,8 +64,12 @@ const List: React.FC<Props> = ({
         listings: listings,
       };
       axios
-        .patch(`http://localhost:4000/updatelist/${listId}`, data)
-        .then((res) => {
+        .patch(`http://localhost:4000/updatelist/${listId}`, data, {
+          headers: {
+            Authorization: "Bearer " + auth.accessToken,
+          },
+        })
+        .then(() => {
           console.log("list saved successfully");
           onSaved();
         })
