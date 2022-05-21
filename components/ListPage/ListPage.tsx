@@ -78,7 +78,7 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
 
     if (listLocation === "server") {
       axios
-        .get(`http://localhost:4000/getlist/${router.query.id}`)
+        .get(`http://192.168.1.206:4000/getlist/${router.query.id}`)
         .then((res) => {
           const data = res.data;
 

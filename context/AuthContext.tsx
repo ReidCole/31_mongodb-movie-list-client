@@ -29,7 +29,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   ) {
     axios
       .post(
-        "http://localhost:4000/login",
+        "http://192.168.1.206:4000/login",
         {
           username: username,
           password: password,
@@ -68,7 +68,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   function refreshToken() {
     axios
       .post(
-        "http://localhost:4000/token",
+        "http://192.168.1.206:4000/token",
         {},
         {
           withCredentials: true,
@@ -117,7 +117,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   ) {
     axios
       .post(
-        "http://localhost:4000/signup",
+        "http://192.168.1.206:4000/signup",
         {
           username: username,
           password: password,
@@ -154,7 +154,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
     }
     setCurrentAccessToken(null);
     axios
-      .post("http://localhost:4000/logout", {}, { withCredentials: true })
+      .post("http://192.168.1.206:4000/logout", {}, { withCredentials: true })
       .then(() => {
         console.log("refresh token successfully deleted");
       })

@@ -52,7 +52,7 @@ const NewList: React.FC<Props> = ({
       listId: "",
     };
     axios
-      .post("http://localhost:4000/createlist", newList)
+      .post("http://192.168.1.206:4000/createlist", newList)
       .then((res) => router.push(`/list/${res.data}`))
       .catch((e) => {
         showNotification("Error: Something went wrong. Please try again later.", "red");

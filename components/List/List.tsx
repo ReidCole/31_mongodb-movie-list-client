@@ -8,6 +8,8 @@ import {
   UndoOutlined,
   LinkOutlined,
   CheckOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
 } from "@ant-design/icons";
 import Listing from "../Listing/Listing";
 import Container from "../Container/Container";
@@ -78,7 +80,7 @@ const List: React.FC<Props> = ({
         listings: listings,
       };
       axios
-        .patch(`http://localhost:4000/updatelist/${listId}`, data, {
+        .patch(`http://192.168.1.206:4000/updatelist/${listId}`, data, {
           headers: {
             Authorization: "Bearer " + auth.accessToken,
           },
@@ -124,7 +126,7 @@ const List: React.FC<Props> = ({
   function deleteList() {
     console.log("delete list");
     if (listLocation === "server") {
-      axios.delete(`http://localhost:4000/deletelist/${listId}`).then((res) => {
+      axios.delete(`http://192.168.1.206:4000/deletelist/${listId}`).then((res) => {
         console.log("deleted successfully");
         router.push("/");
       });
@@ -160,6 +162,15 @@ const List: React.FC<Props> = ({
     const finalList = [...firstHalf, draggedItem, ...secondHalf];
     console.log("final", finalList);
     setListings(finalList);
+  }
+
+  function swapListings(a: number, b: number) {
+    if (a < 0 || b < 0 || a === listings.length || b === listings.length) return;
+    let newListings = listings.slice();
+    const temp = newListings[a];
+    newListings[a] = newListings[b];
+    newListings[b] = temp;
+    setListings(newListings);
   }
 
   return (
@@ -236,9 +247,23 @@ const List: React.FC<Props> = ({
                   ? [
                       <ListingButton
                         key={0}
+                        Icon={ArrowUpOutlined}
+                        mouseOverText="Remove From List"
+                        onClick={() => swapListings(index, index - 1)}
+                        disabled={index === 0}
+                      />,
+                      <ListingButton
+                        key={1}
                         Icon={MinusCircleFilled}
                         mouseOverText="Remove From List"
                         onClick={() => onRemoveFromList(listing)}
+                      />,
+                      <ListingButton
+                        key={2}
+                        Icon={ArrowDownOutlined}
+                        mouseOverText="Remove From List"
+                        onClick={() => swapListings(index, index + 1)}
+                        disabled={index === listings.length - 1}
                       />,
                     ]
                   : []

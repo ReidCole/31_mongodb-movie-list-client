@@ -7,6 +7,7 @@
   border-radius: 0.5rem;
   gap: 0.5rem;
   padding: 0.5rem;
+  cursor: grab;
 }
 
 .img {
@@ -15,6 +16,7 @@
   flex-shrink: 0;
   border-radius: 0.5rem;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .title {
