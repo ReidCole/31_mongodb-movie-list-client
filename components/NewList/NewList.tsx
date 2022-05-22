@@ -1,8 +1,15 @@
-import { MinusCircleFilled, UserOutlined, DownloadOutlined, UndoOutlined } from "@ant-design/icons";
+import {
+  MinusCircleFilled,
+  UserOutlined,
+  DownloadOutlined,
+  UndoOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+} from "@ant-design/icons";
 import axios from "axios";
 import { nanoid } from "nanoid";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
+import { DragEvent, useContext, useEffect, useState } from "react";
 import { ListingType, ListType } from "../../components/ListPage/ListPage";
 import { AuthContext } from "../../context/AuthContext";
 import useNotificationState from "../../hooks/useNotificationState";
@@ -10,6 +17,7 @@ import Button from "../Button/Button";
 import Container from "../Container/Container";
 import Listing from "../Listing/Listing";
 import ListingButton from "../ListingButton/ListingButton";
+import Loading from "../Loading/Loading";
 import Notification from "../Notification/Notification";
 import styles from "./NewList.module.css";
 
@@ -35,6 +43,8 @@ const NewList: React.FC<Props> = ({
   const router = useRouter();
   const [canSave, setCanSave] = useState<boolean>(false);
   const [notificationState, showNotification] = useNotificationState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [listingBeingReordered, setListingBeingReordered] = useState<ListingType | null>(null);
   const auth = useContext(AuthContext);
 
   function saveToAccount() {
@@ -44,6 +54,8 @@ const NewList: React.FC<Props> = ({
       return;
     }
 
+    setIsLoading(true);
+
     const newList: ListType = {
       listName: listName,
       listDescription: listDescription,
@@ -52,10 +64,11 @@ const NewList: React.FC<Props> = ({
       listId: "",
     };
     axios
-      .post("http://192.168.1.206:4000/createlist", newList)
+      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/createlist`, newList)
       .then((res) => router.push(`/list/${res.data}`))
       .catch((e) => {
         showNotification("Error: Something went wrong. Please try again later.", "red");
+        setIsLoading(false);
         console.error(e.message);
       });
   }
@@ -65,6 +78,8 @@ const NewList: React.FC<Props> = ({
       console.error("error validating list. make sure all required fields are filled in");
       return;
     }
+
+    setIsLoading(true);
 
     const newList: ListType = {
       listName: listName,
@@ -85,6 +100,30 @@ const NewList: React.FC<Props> = ({
       localStorage.setItem("lists", newListsString);
     }
     router.push(`/local/${newList.listId}`);
+  }
+
+  function swapListings(a: number, b: number) {
+    if (a < 0 || b < 0 || a === listings.length || b === listings.length) return;
+    let newListings = listings.slice();
+    const temp = newListings[a];
+    newListings[a] = newListings[b];
+    newListings[b] = temp;
+    setListings(newListings);
+  }
+
+  function onDropListing(e: DragEvent<HTMLDivElement>, index: number) {
+    e.preventDefault();
+    const draggedItemString = e.dataTransfer.getData("listing");
+    if (draggedItemString === "") return;
+    const draggedItem: ListingType = JSON.parse(draggedItemString);
+    const prevIndex = listings.findIndex((i) => i.idWithinList === draggedItem.idWithinList);
+    let listWithoutPrev = listings.slice();
+    listWithoutPrev.splice(prevIndex, 1);
+    const newIndex = index;
+    const firstHalf = listWithoutPrev.slice(0, newIndex);
+    const secondHalf = listWithoutPrev.slice(newIndex, listWithoutPrev.length);
+    const finalList = [...firstHalf, draggedItem, ...secondHalf];
+    setListings(finalList);
   }
 
   useEffect(() => {
@@ -140,18 +179,47 @@ const NewList: React.FC<Props> = ({
         body={
           listings.length > 0 ? (
             <div className={styles.list}>
-              {listings.map((listing) => (
+              {listings.map((listing, index) => (
                 <Listing
                   key={listing.idWithinList}
                   listing={listing}
                   buttons={[
                     <ListingButton
                       key={0}
+                      Icon={ArrowUpOutlined}
+                      mouseOverText="Remove From List"
+                      onClick={() => swapListings(index, index - 1)}
+                      disabled={index === 0}
+                    />,
+                    <ListingButton
+                      key={1}
                       Icon={MinusCircleFilled}
                       mouseOverText="Remove From List"
                       onClick={() => onRemoveFromList(listing)}
                     />,
+                    <ListingButton
+                      key={2}
+                      Icon={ArrowDownOutlined}
+                      mouseOverText="Remove From List"
+                      onClick={() => swapListings(index, index + 1)}
+                      disabled={index === listings.length - 1}
+                    />,
                   ]}
+                  canReorder={true}
+                  onDragStart={(e) => {
+                    const draggedItemString = JSON.stringify(listing);
+                    e.dataTransfer.setData("listing", draggedItemString);
+                    setListingBeingReordered(listing);
+                  }}
+                  onDragOver={(e) => {
+                    if (
+                      listingBeingReordered &&
+                      listingBeingReordered.idWithinList !== listing.idWithinList
+                    ) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onDrop={(e) => onDropListing(e, index)}
                 />
               ))}
             </div>
@@ -161,6 +229,7 @@ const NewList: React.FC<Props> = ({
         }
       />
       <Notification state={notificationState} />
+      <Loading isVisible={isLoading} />
     </>
   );
 };

@@ -17,7 +17,7 @@ type Props = {
 const Listing: React.FC<Props> = ({
   listing,
   buttons,
-  canReorder = true,
+  canReorder = false,
   onDragStart,
   onDragOver,
   onDrop,

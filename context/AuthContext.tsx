@@ -9,11 +9,6 @@ type Props = {
   children: ReactNode;
 };
 
-type AccessToken = {
-  token: string;
-  expires: Date;
-};
-
 const AuthProvider: React.FC<Props> = ({ children }) => {
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
   const [currentAccessToken, setCurrentAccessToken] = useState<string | null>(null);
@@ -29,7 +24,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   ) {
     axios
       .post(
-        "http://192.168.1.206:4000/login",
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/login`,
         {
           username: username,
           password: password,
@@ -68,7 +63,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   function refreshToken() {
     axios
       .post(
-        "http://192.168.1.206:4000/token",
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/token`,
         {},
         {
           withCredentials: true,
@@ -117,7 +112,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   ) {
     axios
       .post(
-        "http://192.168.1.206:4000/signup",
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/signup`,
         {
           username: username,
           password: password,
@@ -154,7 +149,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
     }
     setCurrentAccessToken(null);
     axios
-      .post("http://192.168.1.206:4000/logout", {}, { withCredentials: true })
+      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/logout`, {}, { withCredentials: true })
       .then(() => {
         console.log("refresh token successfully deleted");
       })

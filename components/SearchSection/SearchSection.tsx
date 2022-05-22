@@ -33,7 +33,7 @@ const SearchSection: React.FC<Props> = ({ onAddToList }) => {
     setNoResults(false);
     setLoading(true);
     axios
-      .get(`http://192.168.1.206:4000/searchmovies/${query}`)
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/searchmovies/${query}`)
       .then((res) => {
         const data = res.data;
         if (typeof data.results === "undefined") {

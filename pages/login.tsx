@@ -4,35 +4,50 @@ import axios from "axios";
 import Header from "../components/Header/Header";
 import styles from "../styles/Login.module.css";
 import Container from "../components/Container/Container";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Button from "../components/Button/Button";
 import useNotificationState from "../hooks/useNotificationState";
 import Notification from "../components/Notification/Notification";
 import { AuthContext } from "../context/AuthContext";
 import { useRouter } from "next/router";
+import Loading from "../components/Loading/Loading";
 
 const Login: NextPage = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [notificationState, showNotification] = useNotificationState();
+  const [isLoading, setIsLoading] = useState(false);
   const auth = useContext(AuthContext);
   const router = useRouter();
 
+  useEffect(() => {
+    if (auth && auth.username) {
+      router.push("/");
+    }
+  }, [auth, router]);
+
   function authenticate(method: "login" | "signup") {
     if (auth === null) return;
+    setIsLoading(true);
     if (method === "login") {
       auth.login(
         username,
         password,
-        () => router.push("/"),
-        (msg) => showNotification(msg, "red")
+        () => {},
+        (msg) => {
+          showNotification(msg, "red");
+          setIsLoading(false);
+        }
       );
     } else {
       auth.signup(
         username,
         password,
-        () => router.push("/"),
-        (msg) => showNotification(msg, "red")
+        () => {},
+        (msg) => {
+          showNotification(msg, "red");
+          setIsLoading(false);
+        }
       );
     }
   }
@@ -89,6 +104,7 @@ const Login: NextPage = () => {
         />
 
         <Notification state={notificationState} />
+        <Loading isVisible={isLoading} />
       </main>
     </>
   );
