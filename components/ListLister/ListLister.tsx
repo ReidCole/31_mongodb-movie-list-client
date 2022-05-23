@@ -3,9 +3,14 @@ import Container from "../Container/Container";
 import { ListType } from "../ListPage/ListPage";
 import styles from "./ListLister.module.css";
 
+export type ListLink = {
+  listName: string;
+  listId: string;
+};
+
 type Props = {
   heading: string;
-  lists: ListType[];
+  lists: ListLink[];
   linkPrefix: string;
 };
 

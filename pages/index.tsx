@@ -6,26 +6,39 @@ import styles from "../styles/Home.module.css";
 import { ListType } from "../components/ListPage/ListPage";
 import Header from "../components/Header/Header";
 import { PlusOutlined } from "@ant-design/icons";
-import ListLister from "../components/ListLister/ListLister";
+import ListLister, { ListLink } from "../components/ListLister/ListLister";
 import Image from "next/image";
 import tmdbLogo from "../public/img/tmdb.svg";
 import Notification from "../components/Notification/Notification";
 import useNotificationState from "../hooks/useNotificationState";
 import { AuthContext } from "../context/AuthContext";
 import Container from "../components/Container/Container";
+import axios from "axios";
 
 const Home: NextPage = () => {
   const [localStorageLists, setLocalStorageLists] = useState<ListType[]>([]);
-  const [accountLists, setAccountLists] = useState<ListType[]>([]);
+  const [accountLists, setAccountLists] = useState<ListLink[]>([]);
   const auth = useContext(AuthContext);
 
   useEffect(() => {
+    function getAccountLists() {
+      if (auth === null || auth.username === null) return;
+      axios
+        .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/getaccountlists`, { username: auth.username })
+        .then((res) => {
+          setAccountLists(res.data);
+        })
+        .catch((e) => console.error(e));
+    }
+
+    console.log("e");
     const lsLists = localStorage.getItem("lists");
     if (lsLists == null) {
       return;
     }
     setLocalStorageLists(JSON.parse(lsLists));
-  }, []);
+    getAccountLists();
+  }, [auth]);
 
   return (
     <>

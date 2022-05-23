@@ -10,7 +10,6 @@ import {
   CheckOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
-  CloseOutlined,
   ArrowLeftOutlined,
 } from "@ant-design/icons";
 import Listing from "../Listing/Listing";
@@ -83,6 +82,7 @@ const List: React.FC<Props> = ({
 
     console.log("save list", listId);
     if (listLocation === "server") {
+      setIsLoading(true);
       const data = {
         listName: listName,
         listDescription: listDescription,
@@ -96,10 +96,22 @@ const List: React.FC<Props> = ({
         })
         .then(() => {
           console.log("list saved successfully");
+          setIsLoading(false);
           onSaved();
         })
         .catch((e) => {
           console.error("error saving list", e);
+          if (e.request) {
+            if (e.request.status === 403) {
+              showNotification(
+                "Authorization token expired. Sign in again before performing this action.",
+                "red"
+              );
+            } else if (e.request.status === 401) {
+              showNotification("Please sign in to an account to perform this action.", "red");
+            }
+          }
+          setIsLoading(false);
         });
     } else {
       const listToSave: ListType = {
@@ -213,8 +225,10 @@ const List: React.FC<Props> = ({
               ) : (
                 <>
                   <h1 className={styles.listTitle}>{listName}</h1>
-                  <p>{listDescription}</p>
-                  <p className={styles.creator}>Created by {ownerUsername}</p>
+                  {listDescription.length > 0 && (
+                    <p className={styles.listDescription}>{listDescription}</p>
+                  )}
+                  <p className={styles.listOwner}>Created by {ownerUsername}</p>
                 </>
               )}
             </div>
@@ -245,7 +259,6 @@ const List: React.FC<Props> = ({
                     <DeleteOutlined /> Delete
                   </Button>
                 </div>
-                <p className={styles.reorderText}>Drag and drop movies to re-order them.</p>
               </>
             )}
           </div>

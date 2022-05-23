@@ -1,7 +1,9 @@
 import axios from "axios";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
+import { ListType } from "../components/ListPage/ListPage";
+import { ListLink } from "../components/ListLister/ListLister";
 
 export const AuthContext = React.createContext<AuthContextType | null>(null);
 
@@ -12,9 +14,29 @@ type Props = {
 const AuthProvider: React.FC<Props> = ({ children }) => {
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
   const [currentAccessToken, setCurrentAccessToken] = useState<string | null>(null);
-  const [currentTokenExpTimeout, setCurrentTokenExpTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  // todo: state for account lists
+  const startRefreshInterval = useCallback(async () => {
+    const success = await refreshToken();
+    if (!success) {
+      console.log("failed to auto log in. not setting interval");
+      return;
+    }
+
+    const interval = setInterval(async () => {
+      const success = await refreshToken();
+      if (!success) {
+        clearInterval(interval);
+      }
+    }, 60000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    startRefreshInterval();
+  }, [startRefreshInterval]);
 
   function login(
     username: string,
@@ -35,8 +57,11 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       )
       .then((res) => {
         setCurrentUsername(username);
-        setNewAccessToken(res.data.accessToken);
+        setCurrentAccessToken(res.data.accessToken);
         onSuccess();
+
+        // refresh token loop
+        startRefreshInterval();
       })
       .catch((e) => {
         let errorText = "";
@@ -60,48 +85,26 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       });
   }
 
-  function refreshToken() {
-    axios
-      .post(
+  async function refreshToken(): Promise<boolean> {
+    console.log("refreshToken");
+    try {
+      const res = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/token`,
         {},
         {
           withCredentials: true,
         }
-      )
-      .then((res) => {
-        if (typeof res.data.accessToken === "undefined") {
-          throw new Error("access token in refresh token response is undefined");
-        }
-        setNewAccessToken(res.data.accessToken);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-  }
-
-  function setNewAccessToken(token: string) {
-    if (currentTokenExpTimeout !== null) {
-      clearTimeout(currentTokenExpTimeout);
-      setCurrentTokenExpTimeout(null);
-      console.log("cleared previous token timeout");
+      );
+      if (typeof res.data.accessToken === "undefined") {
+        throw new Error("access token in refresh token response is undefined");
+      }
+      setCurrentAccessToken(res.data.accessToken);
+      setCurrentUsername(res.data.username);
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
     }
-    const decoded = jwt.decode(token);
-    if (decoded === null || typeof decoded === "string" || typeof decoded.exp === "undefined") {
-      throw new Error("error decoding jwt");
-    }
-    setCurrentAccessToken(token);
-    const expDate = new Date(decoded.exp * 1000);
-    const earlyExpDate = dayjs(expDate).subtract(5, "seconds").toDate();
-    const timeUntilExp = earlyExpDate.getTime() - Date.now();
-    console.log("timeout in " + timeUntilExp + "ms");
-    const timeout = setTimeout(() => {
-      console.log("refreshing token before it expires");
-      setCurrentTokenExpTimeout(null);
-      refreshToken();
-    }, timeUntilExp);
-    setCurrentTokenExpTimeout(timeout);
-    console.log("set new access token");
   }
 
   function signup(
@@ -124,7 +127,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       .then((res) => {
         console.log("signed up", res.data);
         setCurrentUsername(username);
-        setNewAccessToken(res.data.accessToken);
+        setCurrentAccessToken(res.data.accessToken);
         onSuccess();
       })
       .catch((e) => {
@@ -143,10 +146,6 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
 
   function logout() {
     setCurrentUsername(null);
-    if (currentTokenExpTimeout !== null) {
-      clearTimeout(currentTokenExpTimeout);
-      setCurrentTokenExpTimeout(null);
-    }
     setCurrentAccessToken(null);
     axios
       .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/logout`, {}, { withCredentials: true })

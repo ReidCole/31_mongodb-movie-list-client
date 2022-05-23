@@ -34,6 +34,16 @@
   font-size: var(--heading-font-size);
 }
 
+.listDescription {
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.listOwner {
+  color: var(--clr-subtext);
+  font-size: 0.9rem;
+}
+
 .buttonSection {
   display: flex;
   flex-direction: column;
@@ -62,18 +72,6 @@
   font: inherit;
   padding: 0.6rem;
   font-size: 1rem;
-}
-
-.creator {
-  margin-top: 0.3rem;
-  color: var(--clr-subtext);
-  font-size: 0.9rem;
-}
-
-.reorderText {
-  color: var(--clr-subtext);
-  font-size: 0.9rem;
-  text-align: center;
 }
 
 .modal {
