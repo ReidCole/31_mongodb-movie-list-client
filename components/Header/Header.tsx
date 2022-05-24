@@ -6,24 +6,25 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import Button from "../Button/Button";
 import Sidebar from "../Sidebar/Sidebar";
 import styles from "./Header.module.css";
 
 const Header: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const auth = useContext(AuthContext);
-  const router = useRouter();
 
   return (
     <>
       <header className={styles.header}>
-        <Link href="/">
-          <h1 className={styles.title}>Movie List Maker</h1>
-        </Link>
+        <div className={styles.titleDiv}>
+          <Link href="/">
+            <h1 className={styles.title}>Movie List Maker</h1>
+          </Link>
+          {auth && auth.username && <p>{auth.username}</p>}
+        </div>
+
         <nav className={styles.nav}>
           <Link href="/" passHref>
             <a className={styles.link}>

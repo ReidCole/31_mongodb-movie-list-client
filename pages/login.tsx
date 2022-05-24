@@ -17,6 +17,7 @@ const Login: NextPage = () => {
   const [password, setPassword] = useState<string>("");
   const [notificationState, showNotification] = useNotificationState();
   const [isLoading, setIsLoading] = useState(false);
+  const [canLogin, setCanLogin] = useState<boolean>(false);
   const auth = useContext(AuthContext);
   const router = useRouter();
 
@@ -26,8 +27,21 @@ const Login: NextPage = () => {
     }
   }, [auth, router]);
 
+  useEffect(() => {
+    if (
+      username.length >= 3 &&
+      username.length <= 20 &&
+      password.length >= 3 &&
+      password.length <= 30
+    ) {
+      setCanLogin(true);
+      return;
+    }
+    setCanLogin(false);
+  }, [username, password]);
+
   function authenticate(method: "login" | "signup") {
-    if (auth === null) return;
+    if (auth === null || !canLogin) return;
     setIsLoading(true);
     if (method === "login") {
       auth.login(
@@ -66,7 +80,16 @@ const Login: NextPage = () => {
           body={
             <form onSubmit={(e) => e.preventDefault()} className={styles.form}>
               <label className={styles.label}>
-                <p>Username</p>
+                <div className={styles.labelText}>
+                  <p>Username</p>
+                  {username.length > 0 && (
+                    <p
+                      className={username.length < 3 || username.length > 20 ? styles.invalid : ""}
+                    >
+                      {username.length}
+                    </p>
+                  )}
+                </div>
                 <input
                   className={styles.input}
                   value={username}
@@ -75,7 +98,16 @@ const Login: NextPage = () => {
                 />
               </label>
               <label className={styles.label}>
-                <p>Password</p>
+                <div className={styles.labelText}>
+                  <p>Password</p>
+                  {password.length > 0 && (
+                    <p
+                      className={password.length < 3 || password.length > 30 ? styles.invalid : ""}
+                    >
+                      {password.length}
+                    </p>
+                  )}
+                </div>
                 <input
                   className={styles.input}
                   value={password}
@@ -87,14 +119,14 @@ const Login: NextPage = () => {
                 <Button
                   className={styles.button}
                   onClick={() => authenticate("login")}
-                  disabled={username.length === 0 || password.length === 0}
+                  disabled={!canLogin}
                 >
                   Log In
                 </Button>
                 <Button
                   className={styles.button}
                   onClick={() => authenticate("signup")}
-                  disabled={username.length === 0 || password.length === 0}
+                  disabled={!canLogin}
                 >
                   Sign Up
                 </Button>
@@ -102,6 +134,12 @@ const Login: NextPage = () => {
             </form>
           }
         />
+
+        <div className={styles.requirementsText}>
+          <p>Username must be 3 - 20 characters long.</p>
+          <p>Password must be 3 - 30 characters long.</p>
+          <p>All characters are permitted.</p>
+        </div>
 
         <Notification state={notificationState} />
         <Loading isVisible={isLoading} />

@@ -19,6 +19,15 @@
   width: 100%;
 }
 
+.labelText {
+  display: flex;
+  justify-content: space-between;
+}
+
+.invalid {
+  color: rgb(221, 84, 84);
+}
+
 .input {
   background-color: var(--clr-bg1);
   border: none;
@@ -36,4 +45,16 @@
 
 .button {
   width: 100%;
+}
+
+.requirementsText {
+  background-color: var(--clr-bg2);
+  width: var(--container-width);
+  margin: 0 auto;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }

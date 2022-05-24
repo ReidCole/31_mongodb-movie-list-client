@@ -31,13 +31,13 @@ const Home: NextPage = () => {
         .catch((e) => console.error(e));
     }
 
-    console.log("e");
+    getAccountLists();
+
     const lsLists = localStorage.getItem("lists");
     if (lsLists == null) {
       return;
     }
     setLocalStorageLists(JSON.parse(lsLists));
-    getAccountLists();
   }, [auth]);
 
   return (

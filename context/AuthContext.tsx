@@ -1,9 +1,5 @@
 import axios from "axios";
 import React, { ReactNode, useCallback, useEffect, useState } from "react";
-import jwt from "jsonwebtoken";
-import dayjs from "dayjs";
-import { ListType } from "../components/ListPage/ListPage";
-import { ListLink } from "../components/ListLister/ListLister";
 
 export const AuthContext = React.createContext<AuthContextType | null>(null);
 
@@ -22,6 +18,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       return;
     }
 
+    console.log("setting interval");
     const interval = setInterval(async () => {
       const success = await refreshToken();
       if (!success) {
@@ -37,6 +34,16 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   useEffect(() => {
     startRefreshInterval();
   }, [startRefreshInterval]);
+
+  useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (e.key === "logout" && e.newValue === "true") {
+        logout();
+      }
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   function login(
     username: string,
@@ -59,6 +66,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         setCurrentUsername(username);
         setCurrentAccessToken(res.data.accessToken);
         onSuccess();
+        localStorage.setItem("logout", "false");
 
         // refresh token loop
         startRefreshInterval();
@@ -102,7 +110,9 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       setCurrentUsername(res.data.username);
       return true;
     } catch (e) {
-      console.error(e);
+      if (e) console.error(e);
+      setCurrentAccessToken(null);
+      setCurrentUsername(null);
       return false;
     }
   }
@@ -129,6 +139,9 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         setCurrentUsername(username);
         setCurrentAccessToken(res.data.accessToken);
         onSuccess();
+
+        // refresh token loop
+        startRefreshInterval();
       })
       .catch((e) => {
         let errorText = "";
@@ -150,10 +163,11 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
     axios
       .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/logout`, {}, { withCredentials: true })
       .then(() => {
-        console.log("refresh token successfully deleted");
+        console.log("successfully logged out");
+        localStorage.setItem("logout", "true");
       })
       .catch((e) => {
-        console.error("couldn't remove refresh token", e);
+        console.error("error logging out", e);
       });
   }
 
