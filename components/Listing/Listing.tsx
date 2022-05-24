@@ -24,7 +24,7 @@ const Listing: React.FC<Props> = ({
 }) => {
   return (
     <div
-      className={styles.listing}
+      className={`${styles.listing} ${canReorder ? styles.reorder : ""}`}
       draggable={canReorder}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
