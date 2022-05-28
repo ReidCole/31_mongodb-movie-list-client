@@ -104,7 +104,7 @@ const List: React.FC<Props> = ({
           if (e.request) {
             if (e.request.status === 403) {
               showNotification(
-                "Authorization token expired. Sign in again before performing this action.",
+                "Invalid authorization token. Sign in again before performing this action.",
                 "red"
               );
             } else if (e.request.status === 401) {
