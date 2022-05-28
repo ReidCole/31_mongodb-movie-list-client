@@ -198,13 +198,6 @@ const List: React.FC<Props> = ({
     setListings(newListings);
   }
 
-  console.log(
-    listLocation === "localStorage" || auth?.username !== null,
-    listLocation,
-    auth,
-    auth?.username
-  );
-
   return (
     <>
       <Container
