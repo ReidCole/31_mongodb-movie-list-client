@@ -295,7 +295,7 @@ const List: React.FC<Props> = ({
                       ]
                     : []
                 }
-                canReorder={auth !== null && auth.username !== null}
+                canReorder={listLocation === "localStorage" || auth?.username !== null}
                 onDragStart={(e) => {
                   const draggedItemString = JSON.stringify(listing);
                   e.dataTransfer.setData("listing", draggedItemString);
