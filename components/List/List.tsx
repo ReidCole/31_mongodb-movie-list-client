@@ -145,11 +145,17 @@ const List: React.FC<Props> = ({
   }
 
   function deleteList() {
+    if (auth === null) return;
+
     setIsLoading(true);
     console.log("delete list");
     if (listLocation === "server") {
       axios
-        .delete(`${process.env.NEXT_PUBLIC_SERVER_HOST}/deletelist/${listId}`)
+        .delete(`${process.env.NEXT_PUBLIC_SERVER_HOST}/deletelist/${listId}`, {
+          headers: {
+            Authorization: "Bearer " + auth.accessToken,
+          },
+        })
         .then(() => {
           console.log("deleted successfully");
           router.push("/");

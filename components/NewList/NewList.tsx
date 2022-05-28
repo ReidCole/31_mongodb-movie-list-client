@@ -64,7 +64,11 @@ const NewList: React.FC<Props> = ({
       listId: "",
     };
     axios
-      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/createlist`, newList)
+      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/createlist`, newList, {
+        headers: {
+          Authorization: "Bearer " + auth.accessToken,
+        },
+      })
       .then((res) => router.push(`/list/${res.data}`))
       .catch((e) => {
         showNotification("Error: Something went wrong. Please try again later.", "red");
