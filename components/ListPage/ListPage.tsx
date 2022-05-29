@@ -4,6 +4,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import Footer from "../Footer/Footer";
 import Header from "../Header/Header";
 import List from "../List/List";
 import SearchSection from "../SearchSection/SearchSection";
@@ -218,6 +219,8 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
           onSaved={onSaved}
           listLocation={listLocation}
         />
+
+        <Footer />
       </main>
     </>
   );

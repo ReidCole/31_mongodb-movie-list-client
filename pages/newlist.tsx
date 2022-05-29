@@ -6,6 +6,7 @@ import SearchSection from "../components/SearchSection/SearchSection";
 import { nanoid } from "nanoid";
 import { ListingType } from "../components/ListPage/ListPage";
 import Header from "../components/Header/Header";
+import Footer from "../components/Footer/Footer";
 
 const NewListPage: NextPage = () => {
   const [listName, setListName] = useState("");
@@ -42,6 +43,8 @@ const NewListPage: NextPage = () => {
           setListings={setListings}
           onRemoveFromList={removeFromList}
         />
+
+        <Footer />
       </main>
     </>
   );

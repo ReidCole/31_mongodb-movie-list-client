@@ -39,6 +39,10 @@
   color: var(--clr-primary-h);
   text-decoration: underline;
 }
+.link:focus {
+  outline: none;
+  color: white;
+}
 
 .containerHeading {
   font-size: var(--heading-font-size);

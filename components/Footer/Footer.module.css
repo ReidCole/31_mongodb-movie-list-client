@@ -1,0 +1,20 @@
+.footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--clr-subtext);
+  background-color: var(--clr-bg2);
+  padding: 1rem;
+  margin-top: 4rem;
+}
+
+.link {
+  color: var(--clr-primary-h);
+  text-decoration: underline;
+}
+.link:focus {
+  outline: none;
+  color: white;
+}

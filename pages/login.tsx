@@ -11,6 +11,7 @@ import Notification from "../components/Notification/Notification";
 import { AuthContext } from "../context/AuthContext";
 import { useRouter } from "next/router";
 import Loading from "../components/Loading/Loading";
+import Footer from "../components/Footer/Footer";
 
 const Login: NextPage = () => {
   const [username, setUsername] = useState<string>("");
@@ -143,6 +144,8 @@ const Login: NextPage = () => {
 
         <Notification state={notificationState} />
         <Loading isVisible={isLoading} />
+
+        <Footer />
       </main>
     </>
   );

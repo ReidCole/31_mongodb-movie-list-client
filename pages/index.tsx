@@ -14,6 +14,7 @@ import useNotificationState from "../hooks/useNotificationState";
 import { AuthContext } from "../context/AuthContext";
 import Container from "../components/Container/Container";
 import axios from "axios";
+import Footer from "../components/Footer/Footer";
 
 const Home: NextPage = () => {
   const [localStorageLists, setLocalStorageLists] = useState<ListType[]>([]);
@@ -71,18 +72,22 @@ const Home: NextPage = () => {
 
         <div className={styles.tmdb}>
           <Link href="https://www.themoviedb.org/" passHref>
-            <a className={styles.tmdbImg}>
+            <a className={styles.tmdbImg} rel="noreferrer noopener" target="_blank">
               <Image src={tmdbLogo} width={185} height={133} alt="the movie DB logo" />
             </a>
           </Link>
           <p>
             This site uses the API provided by{" "}
             <Link href="https://www.themoviedb.org/" passHref>
-              <a className={styles.link}>The Movie DB</a>
+              <a className={styles.link} rel="noreferrer noopener" target="_blank">
+                The Movie DB
+              </a>
             </Link>{" "}
             for movie and TV show search results.
           </p>
         </div>
+
+        <Footer />
       </main>
     </>
   );
