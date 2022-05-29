@@ -254,7 +254,8 @@ const List: React.FC<Props> = ({
                   {listLocation === "server" && (
                     <Button
                       onClick={() => {
-                        navigator.clipboard.writeText(`http://localhost:3000/list/${listId}`);
+                        if (typeof window === "undefined") return;
+                        navigator.clipboard.writeText(window.location.href);
                       }}
                     >
                       <LinkOutlined /> Copy Link

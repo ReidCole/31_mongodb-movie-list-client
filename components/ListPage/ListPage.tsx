@@ -2,7 +2,8 @@ import axios from "axios";
 import { nanoid } from "nanoid";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import Header from "../Header/Header";
 import List from "../List/List";
 import SearchSection from "../SearchSection/SearchSection";
@@ -43,6 +44,7 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
   const [ownerUsername, setOwnerUsername] = useState("");
   const [listId, setListId] = useState("");
   const [errorGettingList, setErrorGettingList] = useState<string>("");
+  const auth = useContext(AuthContext);
   const router = useRouter();
 
   function addToList(listing: ListingType) {
@@ -199,7 +201,7 @@ const ListPage: React.FC<Props> = ({ listLocation }) => {
       <main>
         <Header />
 
-        <SearchSection onAddToList={addToList} />
+        {auth && auth.username && <SearchSection onAddToList={addToList} />}
 
         <List
           listName={listName}
