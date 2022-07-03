@@ -1,3 +1,3 @@
-# Movie List Maker Client Repository
+# Movie List Maker Repository
 
 https://client.movielistmakerserver.xyz
