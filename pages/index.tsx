@@ -50,6 +50,14 @@ const Home: NextPage = () => {
       <main>
         <Header />
 
+        <p className={styles.noticeText}>
+          Notice: The server for this site has been shut down due to the costs required to keep it
+          running.
+          <hr />
+          Creating a local storage list with only custom movies is still possible, but everything
+          else is pretty much out of service.
+        </p>
+
         <Link href="/newlist">
           <a className={styles.createNewList}>
             <PlusOutlined /> Create New List

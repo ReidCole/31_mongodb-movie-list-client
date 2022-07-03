@@ -53,3 +53,12 @@
   color: var(--clr-subtext);
   font-weight: bold;
 }
+
+.noticeText {
+  border: 2px solid red;
+  padding: 1rem;
+  margin: 1rem auto;
+  max-width: 50rem;
+  text-align: center;
+  line-height: 1.2rem;
+}
